@@ -41,15 +41,15 @@ void printpacket(struct packet* p, int ptype)
 		return;
 	
 	if(ptype)
-		printf("\tHOST PACKET\n");
+		printf("HOST PACKET\n");
 	else
-		printf("\tNETWORK PACKET\n");
+		printf("NETWORK PACKET\n");
 	
-	printf("\tconid = %d\n", p->conid);
-	printf("\ttype = %d\n", p->type);
-	printf("\tcomid = %d\n", p->comid);
-	printf("\tdatalen = %d\n", p->datalen);
-	printf("\tbuffer = %s\n", p->buffer);
+	printf("conid = %d\n", p->conid);
+	printf("type = %d\n", p->type);
+	printf("comid = %d\n", p->comid);
+	printf("datalen = %d\n", p->datalen);
+	printf("buffer = %s\n", p->buffer);
 	
 	fflush(stdout);
 }

@@ -91,7 +91,7 @@ struct command* userinputtocommand(char s[LENUSERINPUT])
 		return cmd;
 	else
 	{
-		fprintf(stderr, "\tError parsing command\n");
+		fprintf(stderr, "Error parsing command\n");
 		return NULL;
 	}
 }
@@ -101,13 +101,13 @@ void printcommand(struct command* c)
 	if(!DEBUG)
 		return;
 	
-	printf("\tPrinting contents of the above command...\n");
-	printf("\tid = %d\n", c->id);
-	printf("\tnpaths = %d\n", c->npaths);
-	printf("\tpaths =\n");
+	printf("Printing contents of the above command...\n");
+	printf("id = %d\n", c->id);
+	printf("npaths = %d\n", c->npaths);
+	printf("paths =\n");
 	int i;
 	for(i = 0; i < c->npaths; i++)
-		printf("\t\t%s\n", c->paths[i]);
+		printf("\t%s\n", c->paths[i]);
 	printf("\n");
 }
 
@@ -127,7 +127,7 @@ void command_pwd(struct packet* chp, struct packet* data, int sfd_client)
 	if(chp->type == DATA && chp->comid == PWD && strlen(chp->buffer) > 0)
 		printf("%s\n", chp->buffer);
 	else
-		fprintf(stderr, "\tError retrieving information.\n");
+		fprintf(stderr, "Error retrieving information.\n");
 }
 
 void command_cd(struct packet* chp, struct packet* data, int sfd_client, char* path)
@@ -147,7 +147,7 @@ void command_cd(struct packet* chp, struct packet* data, int sfd_client, char* p
 	if(chp->type == INFO && chp->comid == CD && !strcmp(chp->buffer, "success"))
 		;
 	else
-		fprintf(stderr, "\tError executing command on the server.\n");
+		fprintf(stderr, "Error executing command on the server.\n");
 }
 
 void command_lls(char* lpwd)
@@ -177,7 +177,7 @@ void command_ls(struct packet* chp, struct packet* data, int sfd_client)
 			printf("%s\n", chp->buffer);
 		/*
 		else
-			fprintf(stderr, "\tError executing command on the server.\n");
+			fprintf(stderr, "Error executing command on the server.\n");
 		*/
 		if((x = recv(sfd_client, data, size_packet, 0)) <= 0)
 			throwErrorAndExit("recv()", x);
@@ -256,7 +256,7 @@ void command_mget(struct packet* chp, struct packet* data, int sfd_client, int n
 	for(i = 0; i < n; i++)
 	{
 		filename = *(filenames + i);
-		printf("\tProcessing file %d of %d:\t%s\n", i + 1, n, filename);
+		printf("Processing file %d of %d:\t%s\n", i + 1, n, filename);
 		command_get(chp, data, sfd_client, filename);
 	}
 	if(i != n)
@@ -270,7 +270,7 @@ void command_mput(struct packet* chp, struct packet* data, int sfd_client, int n
 	for(i = 0; i < n; i++)
 	{
 		filename = *(filenames + i);
-		printf("\tProcessing file %d of %d:\t%s\n", i + 1, n, filename);
+		printf("Processing file %d of %d:\t%s\n", i + 1, n, filename);
 		command_put(chp, data, sfd_client, filename);
 	}
 	if(i != n)
@@ -393,7 +393,7 @@ void command_rget(struct packet* chp, struct packet* data, int sfd_client)
 		//printpacket(chp, HP);
 	}
 	if(chp->type == EOT)
-		printf("\tTransmission successfully ended.\n");
+		printf("Transmission successfully ended.\n");
 	else
 		fprintf(stderr, "There was a problem completing the request.\n");
 }
@@ -415,12 +415,12 @@ void command_mkdir(struct packet* chp, struct packet* data, int sfd_client, char
 	if(chp->type == INFO && chp->comid == MKDIR)
 	{
 		if(!strcmp(chp->buffer, "success"))
-			printf("\tCreated directory on server.\n");
+			printf("Created directory on server.\n");
 		else if(!strcmp(chp->buffer, "already exists"))
-			printf("\tDirectory already exitst on server.\n");
+			printf("Directory already exitst on server.\n");
 	}
 	else
-		fprintf(stderr, "\tError executing command on the server.\n");
+		fprintf(stderr, "Error executing command on the server.\n");
 }
 
 void command_lmkdir(char* dirname)
@@ -428,13 +428,13 @@ void command_lmkdir(char* dirname)
 	DIR* d = opendir(dirname);
 	if(d)
 	{
-		printf("\tDirectory already exists.\n");
+		printf("Directory already exists.\n");
 		closedir(d);
 	}
 	else if(mkdir(dirname, 0777) == -1)
 		fprintf(stderr, "Error in creating directory.\n");
 	else
-		printf("\tCreated directory.\n");
+		printf("Created directory.\n");
 }
 
 void command_lcd(char* path)
