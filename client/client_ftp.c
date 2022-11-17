@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	bool exit_flag = false;
 	while(!exit_flag)
 	{
-		printf("\t> ");
+		printf("> ");
 		fgets(userinput, LENUSERINPUT, stdin);	// in order to give \
 					a filename with spaces, put ':' \
 					instead of ' '. If a command needs \
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
 			case LPWD:
 				if(!getcwd(lpwd, sizeof lpwd))
 					throwErrorAndExit("getcwd()", 0);
-				printf("\t%s\n", lpwd);
+				printf("%s\n", lpwd);
 				break;
 			case DIR_:
 			case LS:

@@ -35,8 +35,8 @@ void send_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
 			throwErrorAndExit("send()", x);
 		j++;
 	}
-	fprintf(stderr, "\t%d byte(s) read.\n", i);
-	fprintf(stderr, "\t%d data packet(s) sent.\n", j);
+	fprintf(stderr, "%d byte(s) read.\n", i);
+	fprintf(stderr, "%d data packet(s) sent.\n", j);
 	fflush(stderr);
 }
 
@@ -58,8 +58,8 @@ void receive_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
 		hp = ntohp(data);
 		//printpacket(hp, HP);
 	}
-	fprintf(stderr, "\t%d data packet(s) received.\n", --j);	// j decremented because the last packet is EOT.
-	fprintf(stderr, "\t%d byte(s) written.\n", i);
+	fprintf(stderr, "%d data packet(s) received.\n", --j);	// j decremented because the last packet is EOT.
+	fprintf(stderr, "%d byte(s) written.\n", i);
 	if(hp->type == EOT)
 		return;
 	else

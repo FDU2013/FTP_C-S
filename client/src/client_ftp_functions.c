@@ -101,13 +101,13 @@ void printcommand(struct command* c)
 	if(!DEBUG)
 		return;
 	
-	printf("\t\tPrinting contents of the above command...\n");
-	printf("\t\tid = %d\n", c->id);
-	printf("\t\tnpaths = %d\n", c->npaths);
-	printf("\t\tpaths =\n");
+	printf("\tPrinting contents of the above command...\n");
+	printf("\tid = %d\n", c->id);
+	printf("\tnpaths = %d\n", c->npaths);
+	printf("\tpaths =\n");
 	int i;
 	for(i = 0; i < c->npaths; i++)
-		printf("\t\t\t%s\n", c->paths[i]);
+		printf("\t\t%s\n", c->paths[i]);
 	printf("\n");
 }
 
@@ -125,7 +125,7 @@ void command_pwd(struct packet* chp, struct packet* data, int sfd_client)
 		throwErrorAndExit("recv()", x);
 	chp = ntohp(data);
 	if(chp->type == DATA && chp->comid == PWD && strlen(chp->buffer) > 0)
-		printf("\t%s\n", chp->buffer);
+		printf("%s\n", chp->buffer);
 	else
 		fprintf(stderr, "\tError retrieving information.\n");
 }
@@ -157,7 +157,7 @@ void command_lls(char* lpwd)
 		throwErrorAndExit("opendir()", (int) d);
 	struct dirent* e;
 	while(e = readdir(d))
-		printf("\t%s\t%s\n", e->d_type == 4 ? "DIR:" : e->d_type == 8 ? "FILE:" : "UNDEF", e->d_name);
+		printf("%s\t%s\n", e->d_type == 4 ? "DIR:" : e->d_type == 8 ? "FILE:" : "UNDEF", e->d_name);
 	closedir(d);
 }
 
@@ -174,7 +174,7 @@ void command_ls(struct packet* chp, struct packet* data, int sfd_client)
 	while(chp->type != EOT)
 	{
 		if(chp->type == DATA && chp->comid == LS && strlen(chp->buffer))
-			printf("\t%s\n", chp->buffer);
+			printf("%s\n", chp->buffer);
 		/*
 		else
 			fprintf(stderr, "\tError executing command on the server.\n");
@@ -208,7 +208,7 @@ void command_get(struct packet* chp, struct packet* data, int sfd_client, char* 
 	//printpacket(chp, HP);
 	if(chp->type == INFO && chp->comid == GET && strlen(chp->buffer))
 	{
-		printf("\t%s\n", chp->buffer);
+		printf("%s\n", chp->buffer);
 		receive_file(chp, data, sfd_client, f);
 		fclose(f);
 	}
@@ -239,7 +239,7 @@ void command_put(struct packet* chp, struct packet* data, int sfd_client, char* 
 	//printpacket(chp, HP);
 	if(chp->type == INFO && chp->comid == PUT && strlen(chp->buffer))
 	{
-		printf("\t%s\n", chp->buffer);
+		printf("%s\n", chp->buffer);
 		chp->type = DATA;
 		send_file(chp, data, sfd_client, f);
 		fclose(f);
