@@ -1,6 +1,8 @@
 #ifndef COMMONS_H
 #define COMMONS_H
 
+#include<stdbool.h>
+
 #include <arpa/inet.h>
 /*
 	for:
