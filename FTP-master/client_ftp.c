@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 	size_t size_sockaddr = sizeof(struct sockaddr), size_packet = sizeof(struct packet);
 	short int connection_id;
 	struct packet* chp = (struct packet*) malloc(size_packet);		// client host packet
-	set0(chp);
+	init_packet(chp);
 	struct packet* data;							// network packet
 	
 	if((x = sfd_client = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
 	data = htonp(chp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
 		er("send()", x);
-	set0(data);
+	init_packet(data);
 	do
 	{
 		if((x = recv(sfd_client, data, size_packet, 0)) <= 0)

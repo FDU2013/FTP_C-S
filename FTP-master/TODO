@@ -1,4 +1,4 @@
-remove set0(chp) and chp->conid = -1 from the functions in client_udp_functions.c so that the conid is maintained.
+remove init_packet(chp) and chp->conid = -1 from the functions in client_udp_functions.c so that the conid is maintained.
 implement different connections for control and for data.
 implement command queueing on client/server.
 NOT IMPORTANT: implement multi-threading on server side.

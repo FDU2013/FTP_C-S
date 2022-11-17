@@ -121,7 +121,7 @@ struct packet
 	char buffer[LENBUFFER];
 };
 
-void set0(struct packet*);
+void init_packet(struct packet*);
 
 struct packet* ntohp(struct packet*);
 struct packet* htonp(struct packet*);
