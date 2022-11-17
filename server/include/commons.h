@@ -100,7 +100,7 @@ enum TYPE
 #define	NP		0
 #define	HP		1
 
-#define	er(e, x)					\
+#define	throwErrorAndExit(e, x)					\
 	do						\
 	{						\
 		perror("ERROR IN: " #e "\n");		\

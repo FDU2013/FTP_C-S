@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 	struct packet* data;							// network packet
 	
 	if((x = sfd_client = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-		er("socket()", x);
+		throwErrorAndExit("socket()", x);
 	
 	memset((char*) &sin_server, 0, sizeof(struct sockaddr_in));
 	sin_server.sin_family = AF_INET;
@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	sin_server.sin_port = htons(PORTSERVER);
 	
 	if((x = connect(sfd_client, (struct sockaddr*) &sin_server, size_sockaddr)) < 0)
-		er("connect()", x);
+		throwErrorAndExit("connect()", x);
 			
 	printf(ID "FTP Client started up. Attempting communication with server @ %s:%d...\n\n", IPSERVER, PORTSERVER);
 	//END: initialization
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 				break;
 			case MPUTWILD:
 				if(!getcwd(lpwd, sizeof lpwd))
-					er("getcwd()", 0);
+					throwErrorAndExit("getcwd()", 0);
 				command_mputwild(chp, data, sfd_client, lpwd);
 				break;
 			case CD:
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 				break;
 			case LPWD:
 				if(!getcwd(lpwd, sizeof lpwd))
-					er("getcwd()", 0);
+					throwErrorAndExit("getcwd()", 0);
 				printf("\t%s\n", lpwd);
 				break;
 			case DIR_:
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 			case LDIR:
 			case LLS:
 				if(!getcwd(lpwd, sizeof lpwd))
-					er("getcwd()", 0);
+					throwErrorAndExit("getcwd()", 0);
 				command_lls(lpwd);
 				break;
 			case MKDIR:
@@ -120,14 +120,14 @@ int main(int argc, char* argv[])
 				break;
 			case RGET:
 				if(!getcwd(lpwd, sizeof lpwd))
-					er("getcwd()", 0);
+					throwErrorAndExit("getcwd()", 0);
 				command_rget(chp, data, sfd_client);
 				if((x = chdir(lpwd)) == -1)
 					fprintf(stderr, "Wrong path.\n");
 				break;
 			case RPUT:
 				if(!getcwd(lpwd, sizeof lpwd))
-					er("getcwd()", 0);
+					throwErrorAndExit("getcwd()", 0);
 				command_rput(chp, data, sfd_client);
 				if((x = chdir(lpwd)) == -1)
 					fprintf(stderr, "Wrong path.\n");
@@ -149,12 +149,12 @@ int main(int argc, char* argv[])
 	//printpacket(chp, HP);
 	data = htonp(chp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 	init_packet(data);
 	do
 	{
 		if((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-			er("recv()", x);
+			throwErrorAndExit("recv()", x);
 		chp = htonp(data);
 		if(chp->type == INFO)
 			printf(ID "Server says: %s\n", chp->buffer);

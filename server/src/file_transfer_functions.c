@@ -8,7 +8,7 @@ void send_EOT(struct packet* hp, struct packet* data, int sfd)
 	hp->type = EOT;
 	data = htonp(hp);
 	if((x = send(sfd, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 }
 
 void send_TERM(struct packet* hp, struct packet* data, int sfd)
@@ -17,7 +17,7 @@ void send_TERM(struct packet* hp, struct packet* data, int sfd)
 	hp->type = TERM;
 	data = htonp(hp);
 	if((x = send(sfd, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 }
 
 void send_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
@@ -32,7 +32,7 @@ void send_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
 		//printpacket(hp, HP);
 		data = htonp(hp);
 		if((x = send(sfd, data, size_packet, 0)) != size_packet)
-			er("send()", x);
+			throwErrorAndExit("send()", x);
 		j++;
 	}
 	fprintf(stderr, "\t%d byte(s) read.\n", i);
@@ -45,7 +45,7 @@ void receive_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
 	int x;
 	int i = 0, j = 0;
 	if((x = recv(sfd, data, size_packet, 0)) <= 0)
-		er("recv()", x);
+		throwErrorAndExit("recv()", x);
 	j++;
 	hp = ntohp(data);
 	//printpacket(hp, HP);
@@ -53,7 +53,7 @@ void receive_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
 	{
 		i += fwrite(hp->buffer, 1, hp->datalen, f);
 		if((x = recv(sfd, data, size_packet, 0)) <= 0)
-			er("recv()", x);
+			throwErrorAndExit("recv()", x);
 		j++;
 		hp = ntohp(data);
 		//printpacket(hp, HP);

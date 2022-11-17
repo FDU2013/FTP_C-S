@@ -17,7 +17,7 @@ void command_pwd(struct packet* shp, struct packet* data, int sfd_client, char* 
 	strcpy(shp->buffer, lpwd);
 	data = htonp(shp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 }
 
 void command_cd(struct packet* shp, struct packet* data, int sfd_client, char* message)
@@ -27,7 +27,7 @@ void command_cd(struct packet* shp, struct packet* data, int sfd_client, char* m
 	strcpy(shp->buffer, message);
 	data = htonp(shp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 }
 
 void command_ls(struct packet* shp, struct packet* data, int sfd_client, char* lpwd)
@@ -36,14 +36,14 @@ void command_ls(struct packet* shp, struct packet* data, int sfd_client, char* l
 	shp->type = DATA;
 	DIR* d = opendir(lpwd);
 	if(!d)
-		er("opendir()", (int) d);
+		throwErrorAndExit("opendir()", (int) d);
 	struct dirent* e;
 	while(e = readdir(d))
 	{
 		sprintf(shp->buffer, "%s\t%s", e->d_type == 4 ? "DIR:" : e->d_type == 8 ? "FILE:" : "UNDEF:", e->d_name);
 		data = htonp(shp);
 		if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-			er("send()", x);
+			throwErrorAndExit("send()", x);
 	}
 	send_EOT(shp, data, sfd_client);
 }
@@ -58,7 +58,7 @@ void command_get(struct packet* shp, struct packet* data, int sfd_client)
 	//printpacket(shp, HP);
 	data = htonp(shp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 	if(f)
 	{
 		shp->type = DATA;
@@ -78,7 +78,7 @@ void command_put(struct packet* shp, struct packet* data, int sfd_client)
 	//printpacket(shp, HP);
 	data = htonp(shp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 	if(f)
 	{
 		receive_file(shp, data, sfd_client, f);
@@ -107,18 +107,18 @@ void command_mkdir(struct packet* shp, struct packet* data, int sfd_client)
 	strcpy(shp->buffer, message);
 	data = htonp(shp);
 	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
+		throwErrorAndExit("send()", x);
 }
 
 void command_rget(struct packet* shp, struct packet* data, int sfd_client)
 {
 	static char lpwd[LENBUFFER];
 	if(!getcwd(lpwd, sizeof lpwd))
-		er("getcwd()", 0);
+		throwErrorAndExit("getcwd()", 0);
 	int x;
 	DIR* d = opendir(lpwd);
 	if(!d)
-		er("opendir()", (int) d);
+		throwErrorAndExit("opendir()", (int) d);
 	struct dirent* e;
 	while(e = readdir(d))
 		if(e->d_type == 4 && strcmp(e->d_name, ".") && strcmp(e->d_name, ".."))
@@ -130,7 +130,7 @@ void command_rget(struct packet* shp, struct packet* data, int sfd_client)
 			//fprintf(stderr, "LMKDIR: e->d_name = <%s>\n", e->d_name);
 			//printpacket(shp, HP);
 			if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-				er("send()", x);
+				throwErrorAndExit("send()", x);
 			
 			shp->type = REQU;
 			shp->comid = LCD;
@@ -139,9 +139,9 @@ void command_rget(struct packet* shp, struct packet* data, int sfd_client)
 			//fprintf(stderr, "LCD: e->d_name = <%s>\n", e->d_name);
 			//printpacket(shp, HP);
 			if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-				er("send()", x);
+				throwErrorAndExit("send()", x);
 			if((x = chdir(e->d_name)) == -1)
-				er("chdir()", x);
+				throwErrorAndExit("chdir()", x);
 
 			command_rget(shp, data, sfd_client);
 			
@@ -152,9 +152,9 @@ void command_rget(struct packet* shp, struct packet* data, int sfd_client)
 			//fprintf(stderr, "LCD: <..>\n");
 			//printpacket(shp, HP);
 			if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-				er("send()", x);
+				throwErrorAndExit("send()", x);
 			if((x = chdir("..")) == -1)
-				er("chdir()", x);
+				throwErrorAndExit("chdir()", x);
 		}
 		else if(e->d_type == 8)
 		{
@@ -165,9 +165,9 @@ void command_rget(struct packet* shp, struct packet* data, int sfd_client)
 			//fprintf(stderr, "GET: e->d_name = <%s>\n", e->d_name);
 			//printpacket(shp, HP);
 			if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-				er("send()", x);
+				throwErrorAndExit("send()", x);
 			if((x = recv(sfd_client, data, size_packet, 0)) == 0)
-				er("recv()", x);
+				throwErrorAndExit("recv()", x);
 			shp = ntohp(data);
 			if(shp->type == REQU && shp->comid == GET)
 				command_get(shp, data, sfd_client);

@@ -12,7 +12,7 @@ int main(void)
 	short int connection_id = 0;
 	
 	if((x = sfd_server = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
-		er("socket()", x);
+		throwErrorAndExit("socket()", x);
 	
 	memset((char*) &sin_server, 0, sizeof(struct sockaddr_in));
 	sin_server.sin_family = AF_INET;
@@ -20,10 +20,10 @@ int main(void)
 	sin_server.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	if((x = bind(sfd_server, (struct sockaddr*) &sin_server, size_sockaddr)) < 0)
-		er("bind()", x);
+		throwErrorAndExit("bind()", x);
 	
 	if((x = listen(sfd_server, 1)) < 0)
-		er("listen()", x);
+		throwErrorAndExit("listen()", x);
 	
 	printf(ID "FTP Server started up @ local:%d. Waiting for client(s)...\n\n", PORTSERVER);
 	//END: initialization
@@ -32,7 +32,7 @@ int main(void)
 	while(1)
 	{
 		if((x = sfd_client = accept(sfd_server, (struct sockaddr*) &sin_client, &size_sockaddr)) < 0)
-			er("accept()", x);
+			throwErrorAndExit("accept()", x);
 		printf(ID "Communication started with %s:%d\n", inet_ntoa(sin_client.sin_addr), ntohs(sin_client.sin_port));
 		fflush(stdout);
 		
@@ -79,7 +79,7 @@ void* serve_client(void* info)
 			{
 				case PWD:
 					if(!getcwd(lpwd, sizeof lpwd))
-						er("getcwd()", 0);
+						throwErrorAndExit("getcwd()", 0);
 					command_pwd(shp, data, sfd_client, lpwd);
 					break;
 				case CD:
@@ -92,7 +92,7 @@ void* serve_client(void* info)
 					break;
 				case LS:
 					if(!getcwd(lpwd, sizeof lpwd))
-						er("getcwd()", 0);
+						throwErrorAndExit("getcwd()", 0);
 					command_ls(shp, data, sfd_client, lpwd);
 					break;
 				case GET:
@@ -103,7 +103,7 @@ void* serve_client(void* info)
 					break;
 				case RGET:
 					if(!getcwd(lpwd, sizeof lpwd))
-						er("getcwd()", 0);
+						throwErrorAndExit("getcwd()", 0);
 					command_rget(shp, data, sfd_client);
 					send_EOT(shp, data, sfd_client);
 					if((x = chdir(lpwd)) == -1)
@@ -119,7 +119,7 @@ void* serve_client(void* info)
 			sprintf(shp->buffer, "File found. Processing...");
 			data = htonp(shp);
 			if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-				er("send()", x);
+				throwErrorAndExit("send()", x);
 			
 			send_file(path, sfd_client, shp);
 			send_TERM(sfd_client, shp);
