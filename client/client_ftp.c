@@ -29,7 +29,8 @@ int main(int argc, char* argv[])
 	struct command* cmd;
 	char lpwd[LENBUFFER], pwd[LENBUFFER];
 	char userinput[LENUSERINPUT];
-	while(1)
+	bool exit_flag = false;
+	while(!exit_flag)
 	{
 		printf("\t> ");
 		fgets(userinput, LENUSERINPUT, stdin);	// in order to give \
@@ -133,41 +134,14 @@ int main(int argc, char* argv[])
 					fprintf(stderr, "Wrong path.\n");
 				break;
 			case EXIT:
-				goto outside_client_command_loop;
+				exit_flag = true;
+				break;
 			default:
 				// display error
 				break;
 		}
 	}
-	outside_client_command_loop:
 	
-	/*
-	chp->type = REQU;
-	chp->conid = -1;
-	strcpy(path, argv[1]);
-	strcpy(chp->buffer, argv[1]);
-	//printpacket(chp, HP);
-	data = htonp(chp);
-	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-		er("send()", x);
-	set0(data);
-	do
-	{
-		if((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-			er("recv()", x);
-		chp = htonp(data);
-		if(chp->type == INFO)
-			printf(ID "Server says: %s\n", chp->buffer);
-		else if(chp->type == DATA)
-		{
-			//printpacket(chp, HP);
-			receive_file(extract_filename(path), sfd_client, chp);
-		}
-	}
-	while(chp->type != TERM);
-	
-	fprintf(stderr, "TERM received; exiting...\n");
-	*/
 
 	close(sfd_client);
 	printf(ID "Done.\n");
