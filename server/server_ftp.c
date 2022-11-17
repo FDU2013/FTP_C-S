@@ -1,4 +1,4 @@
-#include <server_inc/server_command.h>
+#include <server_command.h>
 
 size_t size_sockaddr = sizeof(struct sockaddr), size_packet = sizeof(struct packet);
 

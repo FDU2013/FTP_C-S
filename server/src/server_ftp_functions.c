@@ -1,4 +1,4 @@
-#include <server_inc/server_command.h>
+#include <server_command.h>
 
 static size_t size_packet = sizeof(struct packet);
 
