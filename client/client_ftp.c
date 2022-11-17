@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	bool exit_flag = false;
 	while(!exit_flag)
 	{
-		printf("> ");
+		printf("(ftp_client)> ");
 		fgets(userinput, LENUSERINPUT, stdin);	// in order to give \
 					a filename with spaces, put ':' \
 					instead of ' '. If a command needs \
