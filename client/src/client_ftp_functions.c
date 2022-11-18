@@ -12,6 +12,9 @@ static const char commandlist[NCOMMANDS][10] =
 		
 		"cd",
 		"lcd",
+
+		"delete",
+		"ldelete",
 		
 		"mgetwild",
 		"mputwild",
@@ -443,3 +446,28 @@ void command_lcd(char* path)
 		fprintf(stderr, "Wrong path : <%s>\n", path);
 }
 
+void command_delete(struct packet* chp, struct packet* data, int sfd_client, char* filename)
+{
+	int x;
+	init_packet(chp);
+	chp->type = REQU;
+	chp->conid = -1;
+	chp->comid = DELETE;
+	strcpy(chp->buffer,filename);
+	data = htonp(chp);
+	if((x = send(sfd_client, data, size_packet, 0)) != size_packet)
+		throwErrorAndExit("send()", x);
+	if((x = recv(sfd_client, data, size_packet, 0)) <= 0)
+		throwErrorAndExit("recv()", x);
+	chp = ntohp(data);
+
+	if(chp->type == INFO && chp->comid == DELETE && !strcmp(chp->buffer, "success"))
+		;
+	else
+		fprintf(stderr, "Error executing command on the server.\n");
+}
+
+void command_ldelete(char* path)
+{
+
+}

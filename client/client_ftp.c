@@ -89,6 +89,16 @@ int main(int argc, char* argv[])
 				else
 					fprintf(stderr, "No path given.\n");
 				break;
+			case DELETE:
+				if(cmd->npaths)
+					command_delete(*cmd->paths);
+				else fprintf(stderr, "No path to file given.\n");
+				break;
+			case LDELETE:
+				if(cmd->npaths)
+					command_ldelete(*cmd->paths);
+				else fprintf(stderr, "No path to file given.\n");
+				break;
 			case PWD:
 				command_pwd(chp, data, sfd_client);
 				break;

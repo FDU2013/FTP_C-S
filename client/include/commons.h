@@ -130,7 +130,7 @@ void printpacket(struct packet*, int);
 FILE* ReadFileAuto(char* filename);
 FILE* WriteFileAuto(char* filename);
 
-#define NCOMMANDS 19
+#define NCOMMANDS 21
 enum COMMAND
 	{
 		GET,
@@ -139,7 +139,9 @@ enum COMMAND
 		MPUT,
 		CD,
 		LCD,
-		MGETWILD,
+		DELETE,
+		LDELETE,
+  		MGETWILD,
 		MPUTWILD,
 		DIR_,		// _ to avoid conflict with directory pointer DIR
 		LDIR,
