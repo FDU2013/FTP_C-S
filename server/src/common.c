@@ -1,11 +1,11 @@
 #include <common.h>
 
-static size_t size_packet = sizeof(struct packet);
+static size_t size_packet = sizeof(struct Packet);
 
-void init_packet(struct packet* p) { memset(p, 0, sizeof(struct packet)); }
+void init_packet(struct Packet* p) { memset(p, 0, sizeof(struct Packet)); }
 
-struct packet* ntohp(struct packet* np) {
-  struct packet* hp = (struct packet*)malloc(size_packet);
+struct Packet* ntohp(struct Packet* np) {
+  struct Packet* hp = (struct Packet*)malloc(size_packet);
   memset(hp, 0, size_packet);
 
   hp->conid = ntohs(np->conid);
@@ -17,8 +17,8 @@ struct packet* ntohp(struct packet* np) {
   return hp;
 }
 
-struct packet* htonp(struct packet* hp) {
-  struct packet* np = (struct packet*)malloc(size_packet);
+struct Packet* htonp(struct Packet* hp) {
+  struct Packet* np = (struct Packet*)malloc(size_packet);
   memset(np, 0, size_packet);
 
   np->conid = ntohs(hp->conid);
@@ -30,7 +30,7 @@ struct packet* htonp(struct packet* hp) {
   return np;
 }
 
-void printpacket(struct packet* p, int ptype) {
+void printpacket(struct Packet* p, int ptype) {
   if (!DEBUG) return;
 
   if (ptype)

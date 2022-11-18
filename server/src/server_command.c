@@ -1,6 +1,6 @@
 #include <server_command.h>
 
-static size_t size_packet = sizeof(struct packet);
+static size_t size_packet = sizeof(struct Packet);
 
 struct client_info* client_info_alloc(int s, int c)
 {
@@ -10,7 +10,7 @@ struct client_info* client_info_alloc(int s, int c)
 	return ci;
 }
 
-void command_pwd(struct packet* shp, struct packet* data, int sfd_client, char* lpwd)
+void command_pwd(struct Packet* shp, struct Packet* data, int sfd_client, char* lpwd)
 {
 	int x;
 	shp->type = DATA;
@@ -20,7 +20,7 @@ void command_pwd(struct packet* shp, struct packet* data, int sfd_client, char* 
 		throwErrorAndExit("send()", x);
 }
 
-void command_cd(struct packet* shp, struct packet* data, int sfd_client, char* message)
+void command_cd(struct Packet* shp, struct Packet* data, int sfd_client, char* message)
 {
 	int x;
 	shp->type = INFO;
@@ -30,7 +30,7 @@ void command_cd(struct packet* shp, struct packet* data, int sfd_client, char* m
 		throwErrorAndExit("send()", x);
 }
 
-void command_ls(struct packet* shp, struct packet* data, int sfd_client, char* lpwd)
+void command_ls(struct Packet* shp, struct Packet* data, int sfd_client, char* lpwd)
 {
 	int x;
 	shp->type = DATA;
@@ -48,7 +48,7 @@ void command_ls(struct packet* shp, struct packet* data, int sfd_client, char* l
 	send_EOT(shp, data, sfd_client);
 }
 
-void command_get(struct packet* shp, struct packet* data, int sfd_client)
+void command_get(struct Packet* shp, struct Packet* data, int sfd_client)
 {
 	int x;
 	FILE* f = ReadFileAuto(shp->buffer);	// Yo!
@@ -68,7 +68,7 @@ void command_get(struct packet* shp, struct packet* data, int sfd_client)
 	send_EOT(shp, data, sfd_client);
 }
 
-void command_put(struct packet* shp, struct packet* data, int sfd_client)
+void command_put(struct Packet* shp, struct Packet* data, int sfd_client)
 {
 	int x;
 	FILE* f = WriteFileAuto(shp->buffer);
@@ -86,7 +86,7 @@ void command_put(struct packet* shp, struct packet* data, int sfd_client)
 	}
 }
 
-void command_mkdir(struct packet* shp, struct packet* data, int sfd_client)
+void command_mkdir(struct Packet* shp, struct Packet* data, int sfd_client)
 {
 	char message[LENBUFFER];
 	DIR* d = opendir(shp->buffer);
@@ -110,7 +110,7 @@ void command_mkdir(struct packet* shp, struct packet* data, int sfd_client)
 		throwErrorAndExit("send()", x);
 }
 
-void command_rget(struct packet* shp, struct packet* data, int sfd_client)
+void command_rget(struct Packet* shp, struct Packet* data, int sfd_client)
 {
 	static char lpwd[LENBUFFER];
 	if(!getcwd(lpwd, sizeof lpwd))

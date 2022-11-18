@@ -5,12 +5,12 @@ int main(int argc, char* argv[]) {
   struct sockaddr_in sin_server;
   int sfd_client, x;
   size_t size_sockaddr = sizeof(struct sockaddr),
-         size_packet = sizeof(struct packet);
+         size_packet = sizeof(struct Packet);
   short int connection_id;
-  struct packet* chp =
-      (struct packet*)malloc(size_packet);  // client host packet
+  struct Packet* chp =
+      (struct Packet*)malloc(size_packet);  // client host packet
   init_packet(chp);
-  struct packet* data;  // network packet
+  struct Packet* data;  // network packet
 
   if ((x = sfd_client = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     throwErrorAndExit("socket()", x);

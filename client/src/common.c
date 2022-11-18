@@ -1,51 +1,67 @@
 #include <common.h>
 
-static size_t size_packet = sizeof(struct packet);
+static size_t size_packet = sizeof(struct Packet);
 
-void init_packet(struct packet* p) { memset(p, 0, sizeof(struct packet)); }
+void InitPacket(struct Packet* p) { memset(p, 0, sizeof(struct Packet)); }
 
-struct packet* ntohp(struct packet* np) {
-  struct packet* hp = (struct packet*)malloc(size_packet);
-  memset(hp, 0, size_packet);
-
-  hp->conid = ntohs(np->conid);
-  hp->type = ntohs(np->type);
-  hp->comid = ntohs(np->comid);
-  hp->datalen = ntohs(np->datalen);
-  memcpy(hp->buffer, np->buffer, LENBUFFER);
-
-  return hp;
+void ntoh_packet(struct Packet* netPacket){
+  netPacket->connection_id = ntohs(netPacket->connection_id);
+  netPacket->type = ntohs(netPacket->type);
+  netPacket->command_type = ntohs(netPacket->command_type);
+  netPacket->data_size = ntohs(netPacket->data_size);
 }
 
-struct packet* htonp(struct packet* hp) {
-  struct packet* np = (struct packet*)malloc(size_packet);
-  memset(np, 0, size_packet);
+void hton_packet(struct Packet* hostPacket){
+  
+  hostPacket->connection_id = ntohs(hostPacket->connection_id);
+  hostPacket->type = ntohs(hostPacket->type);
+  hostPacket->comid = ntohs(hostPacket->comid);
+  hostPacket->data_size = ntohs(hostPacket->data_size);
 
-  np->conid = ntohs(hp->conid);
-  np->type = ntohs(hp->type);
-  np->comid = ntohs(hp->comid);
-  np->datalen = ntohs(hp->datalen);
-  memcpy(np->buffer, hp->buffer, LENBUFFER);
-
-  return np;
 }
 
-void printpacket(struct packet* p, int ptype) {
-  if (!DEBUG) return;
+// struct Packet* new_ntoh_packet(struct Packet* netPacket) {
+//   struct Packet* hostPacket = (struct Packet*)malloc(size_packet);
+//   memset(hostPacket, 0, size_packet);
 
-  if (ptype)
-    printf("HOST PACKET\n");
-  else
-    printf("NETWORK PACKET\n");
+//   hostPacket->connection_id = ntohs(netPacket->connection_id);
+//   hostPacket->type = ntohs(netPacket->type);
+//   hostPacket->command_type = ntohs(netPacket->command_type);
+//   hostPacket->data_size = ntohs(netPacket->data_size);
+//   memcpy(hostPacket->buffer, netPacket->buffer, BUF_SIZE);
 
-  printf("conid = %d\n", p->conid);
-  printf("type = %d\n", p->type);
-  printf("comid = %d\n", p->comid);
-  printf("datalen = %d\n", p->datalen);
-  printf("buffer = %s\n", p->buffer);
+//   return hostPacket;
+// }
 
-  fflush(stdout);
-}
+// struct Packet* new_hton_packet(struct Packet* hostPacket) {
+//   struct Packet* netPacket = (struct Packet*)malloc(size_packet);
+//   memset(netPacket, 0, size_packet);
+
+//   netPacket->connection_id = ntohs(hostPacket->connection_id);
+//   netPacket->type = ntohs(hostPacket->type);
+//   netPacket->comid = ntohs(hostPacket->comid);
+//   netPacket->data_size = ntohs(hostPacket->data_size);
+//   memcpy(netPacket->buffer, hostPacket->buffer, LENBUFFER);
+
+//   return netPacket;
+// }
+
+// void printpacket(struct Packet* p, int ptype) {
+//   if (!DEBUG) return;
+
+//   if (ptype)
+//     printf("HOST PACKET\n");
+//   else
+//     printf("NETWORK PACKET\n");
+
+//   printf("conid = %d\n", p->conid);
+//   printf("type = %d\n", p->type);
+//   printf("comid = %d\n", p->comid);
+//   printf("datalen = %d\n", p->datalen);
+//   printf("buffer = %s\n", p->buffer);
+
+//   fflush(stdout);
+// }
 
 bool IsAsciiFile(char* filename) {
   int len = strlen(filename);

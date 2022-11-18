@@ -1,7 +1,7 @@
 #include <server_command.h>
 
 size_t size_sockaddr = sizeof(struct sockaddr),
-       size_packet = sizeof(struct packet);
+       size_packet = sizeof(struct Packet);
 
 void* serve_client(void*);
 
@@ -55,8 +55,8 @@ int main(void) {
 
 void* serve_client(void* info) {
   int sfd_client, connection_id, x;
-  struct packet* data = (struct packet*)malloc(size_packet);
-  struct packet* shp;
+  struct Packet* data = (struct Packet*)malloc(size_packet);
+  struct Packet* shp;
   char lpwd[LENBUFFER];
   struct client_info* ci = (struct client_info*)info;
   sfd_client = ci->sfd;

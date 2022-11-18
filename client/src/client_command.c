@@ -1,6 +1,6 @@
 #include <client_command.h>
 
-static size_t size_packet = sizeof(struct packet);
+static size_t size_packet = sizeof(struct Packet);
 
 static const char commandlist[NCOMMANDS][10] = {
     "get",      "put",
@@ -91,7 +91,7 @@ void printcommand(struct command* c) {
   printf("\n");
 }
 
-void command_pwd(struct packet* chp, struct packet* data, int sfd_client) {
+void command_pwd(struct Packet* chp, struct Packet* data, int sfd_client) {
   int x;
   init_packet(chp);
   chp->type = REQU;
@@ -109,7 +109,7 @@ void command_pwd(struct packet* chp, struct packet* data, int sfd_client) {
     fprintf(stderr, "Error retrieving information.\n");
 }
 
-void command_cd(struct packet* chp, struct packet* data, int sfd_client,
+void command_cd(struct Packet* chp, struct Packet* data, int sfd_client,
                 char* path) {
   int x;
   init_packet(chp);
@@ -142,7 +142,7 @@ void command_lls(char* lpwd) {
   closedir(d);
 }
 
-void command_ls(struct packet* chp, struct packet* data, int sfd_client) {
+void command_ls(struct Packet* chp, struct Packet* data, int sfd_client) {
   int x;
   init_packet(chp);
   chp->type = REQU;
@@ -164,7 +164,7 @@ void command_ls(struct packet* chp, struct packet* data, int sfd_client) {
   }
 }
 
-void command_get(struct packet* chp, struct packet* data, int sfd_client,
+void command_get(struct Packet* chp, struct Packet* data, int sfd_client,
                  char* filename) {
   FILE* f = WriteFileAuto(filename);
   if (!f) {
@@ -192,7 +192,7 @@ void command_get(struct packet* chp, struct packet* data, int sfd_client,
     fprintf(stderr, "Error getting remote file : <%s>\n", filename);
 }
 
-void command_put(struct packet* chp, struct packet* data, int sfd_client,
+void command_put(struct Packet* chp, struct Packet* data, int sfd_client,
                  char* filename) {
   FILE* f = ReadFileAuto(filename);  // Yo!
   if (!f) {
@@ -205,12 +205,12 @@ void command_put(struct packet* chp, struct packet* data, int sfd_client,
   chp->conid = -1;
   chp->comid = PUT;
   strcpy(chp->buffer, filename);
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
+  hton_packet(chp);
+  if ((x = send(sfd_client, chp, size_packet, 0)) != size_packet)
     throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
+  if ((x = recv(sfd_client, chp, size_packet, 0)) <= 0)
     throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
+  ntoh_packet(chp);
   // printpacket(chp, HP);
   if (chp->type == INFO && chp->comid == PUT && strlen(chp->buffer)) {
     printf("%s\n", chp->buffer);
@@ -222,7 +222,7 @@ void command_put(struct packet* chp, struct packet* data, int sfd_client,
   send_EOT(chp, data, sfd_client);
 }
 
-void command_mget(struct packet* chp, struct packet* data, int sfd_client,
+void command_mget(struct Packet* chp, struct Packet* data, int sfd_client,
                   int n, char** filenames) {
   int i;
   char* filename;
@@ -234,7 +234,7 @@ void command_mget(struct packet* chp, struct packet* data, int sfd_client,
   if (i != n) fprintf(stderr, "Not all files could be downloaded.\n");
 }
 
-void command_mput(struct packet* chp, struct packet* data, int sfd_client,
+void command_mput(struct Packet* chp, struct Packet* data, int sfd_client,
                   int n, char** filenames) {
   int i;
   char* filename;
@@ -246,7 +246,7 @@ void command_mput(struct packet* chp, struct packet* data, int sfd_client,
   if (i != n) fprintf(stderr, "Not all files could be uploaded.\n");
 }
 
-void command_mgetwild(struct packet* chp, struct packet* data, int sfd_client) {
+void command_mgetwild(struct Packet* chp, struct Packet* data, int sfd_client) {
   int x;
   init_packet(chp);
   chp->type = REQU;
@@ -269,7 +269,7 @@ void command_mgetwild(struct packet* chp, struct packet* data, int sfd_client) {
   command_mget(chp, data, sfd_client, cmd->npaths, cmd->paths);
 }
 
-void command_mputwild(struct packet* chp, struct packet* data, int sfd_client,
+void command_mputwild(struct Packet* chp, struct Packet* data, int sfd_client,
                       char* lpwd) {
   DIR* d = opendir(lpwd);
   if (!d) throwErrorAndExit("opendir()", (int)d);
@@ -284,7 +284,7 @@ void command_mputwild(struct packet* chp, struct packet* data, int sfd_client,
   command_mput(chp, data, sfd_client, cmd->npaths, cmd->paths);
 }
 
-void command_rput(struct packet* chp, struct packet* data, int sfd_client) {
+void command_rput(struct Packet* chp, struct Packet* data, int sfd_client) {
   static char lpwd[LENBUFFER];
   if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
   int x;
@@ -314,7 +314,7 @@ void command_rput(struct packet* chp, struct packet* data, int sfd_client) {
   command_mput(chp, data, sfd_client, cmd->npaths, cmd->paths);
 }
 
-void command_rget(struct packet* chp, struct packet* data, int sfd_client) {
+void command_rget(struct Packet* chp, struct Packet* data, int sfd_client) {
   char temp[LENBUFFER];
   int x;
   init_packet(chp);
@@ -352,7 +352,7 @@ void command_rget(struct packet* chp, struct packet* data, int sfd_client) {
     fprintf(stderr, "There was a problem completing the request.\n");
 }
 
-void command_mkdir(struct packet* chp, struct packet* data, int sfd_client,
+void command_mkdir(struct Packet* chp, struct Packet* data, int sfd_client,
                    char* dirname) {
   int x;
   init_packet(chp);
@@ -390,7 +390,7 @@ void command_lcd(char* path) {
   if (chdir(path) == -1) fprintf(stderr, "Wrong path : <%s>\n", path);
 }
 
-void command_delete(struct packet* chp, struct packet* data, int sfd_client,
+void command_delete(struct Packet* chp, struct Packet* data, int sfd_client,
                     char* filename) {
   int x;
   init_packet(chp);

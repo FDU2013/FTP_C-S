@@ -28,10 +28,10 @@ struct ServerInfo {
 
 struct client_info* client_info_alloc(int, int);
 
-void command_pwd(struct packet*, struct packet*, int, char*);
-void command_cd(struct packet*, struct packet*, int, char*);
-void command_ls(struct packet*, struct packet*, int, char*);
-void command_get(struct packet*, struct packet*, int);
-void command_put(struct packet*, struct packet*, int);
-void command_mkdir(struct packet*, struct packet*, int);
-void command_rget(struct packet*, struct packet*, int);
+void command_pwd(struct Packet*, struct Packet*, int, char*);
+void command_cd(struct Packet*, struct Packet*, int, char*);
+void command_ls(struct Packet*, struct Packet*, int, char*);
+void command_get(struct Packet*, struct Packet*, int);
+void command_put(struct Packet*, struct Packet*, int);
+void command_mkdir(struct Packet*, struct Packet*, int);
+void command_rget(struct Packet*, struct Packet*, int);

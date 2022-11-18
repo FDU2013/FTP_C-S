@@ -1,8 +1,8 @@
 #include <file_transfer_functions.h>
 
-static size_t size_packet = sizeof(struct packet);
+static size_t size_packet = sizeof(struct Packet);
 
-void send_EOT(struct packet* hp, struct packet* data, int sfd)
+void send_EOT(struct Packet* hp, struct Packet* data, int sfd)
 {
 	int x;
 	hp->type = EOT;
@@ -11,7 +11,7 @@ void send_EOT(struct packet* hp, struct packet* data, int sfd)
 		throwErrorAndExit("send()", x);
 }
 
-void send_TERM(struct packet* hp, struct packet* data, int sfd)
+void send_TERM(struct Packet* hp, struct Packet* data, int sfd)
 {
 	int x;
 	hp->type = TERM;
@@ -20,7 +20,7 @@ void send_TERM(struct packet* hp, struct packet* data, int sfd)
 		throwErrorAndExit("send()", x);
 }
 
-void send_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
+void send_file(struct Packet* hp, struct Packet* data, int sfd, FILE* f)
 {
 	int x;
 	int i = 0, j = 0;
@@ -40,7 +40,7 @@ void send_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
 	fflush(stderr);
 }
 
-void receive_file(struct packet* hp, struct packet* data, int sfd, FILE* f)
+void receive_file(struct Packet* hp, struct Packet* data, int sfd, FILE* f)
 {
 	int x;
 	int i = 0, j = 0;

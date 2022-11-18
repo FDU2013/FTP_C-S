@@ -102,7 +102,7 @@ enum { kRequest, kResponse, kData, kEnd, kError };
 
 // #define LENBUFFER \
 //   504  // so as to make the whole packet well-rounded ( = 512 bytes)
-// struct packet {
+// struct Packet {
 //   short int conid;
 //   short int type;
 //   short int comid;
@@ -128,7 +128,7 @@ void InitPacket(struct Packet*);
 struct Packet* ntoh_packet(struct Packet*);
 struct Packet* hton_packet(struct Packet*);
 
-// void printpacket(struct packet*, int);
+// void printpacket(struct Packet*, int);
 FILE* ReadFileAuto(char* filename);
 FILE* WriteFileAuto(char* filename);
 
