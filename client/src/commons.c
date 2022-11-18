@@ -57,14 +57,10 @@ void printpacket(struct packet* p, int ptype)
 bool IsAsciiFile(char* filename){
 	int len = strlen(filename);
 	if(len>4 && strcmp(".txt",filename + len-4)==0){
-		printf("(debug).txt file\n");
+		//printf("(info).txt file, transfer by ascii mode\n");
 		return true;
 	}
-	if(len>4 && strcmp(".jpg",filename + len-4)==0){
-		printf("(debug).jpg file\n");
-		return true;
-	}
-	printf("(debug)normal file\n");
+	//printf("(info)normal file, transfer by binary mode \n");
 	return false;
 }
 
