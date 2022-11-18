@@ -187,7 +187,7 @@ void command_ls(struct packet* chp, struct packet* data, int sfd_client)
 
 void command_get(struct packet* chp, struct packet* data, int sfd_client, char* filename)
 {
-	FILE* f = fopen(filename, "wb");
+	FILE* f = WriteFileAuto(filename);
 	if(!f)
 	{
 		fprintf(stderr, "File could not be opened for writing. Aborting...\n");
@@ -218,7 +218,7 @@ void command_get(struct packet* chp, struct packet* data, int sfd_client, char* 
 
 void command_put(struct packet* chp, struct packet* data, int sfd_client, char* filename)
 {
-	FILE* f = fopen(filename, "rb");	// Yo!
+	FILE* f = ReadFileAuto(filename);	// Yo!
 	if(!f)
 	{
 		fprintf(stderr, "File could not be opened for reading. Aborting...\n");

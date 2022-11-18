@@ -51,7 +51,7 @@ void command_ls(struct packet* shp, struct packet* data, int sfd_client, char* l
 void command_get(struct packet* shp, struct packet* data, int sfd_client)
 {
 	int x;
-	FILE* f = fopen(shp->buffer, "rb");	// Yo!
+	FILE* f = ReadFileAuto(shp->buffer);	// Yo!
 	shp->type = INFO;
 	shp->comid = GET;
 	strcpy(shp->buffer, f ? "File found; processing" : "Error opening file.");
@@ -71,7 +71,7 @@ void command_get(struct packet* shp, struct packet* data, int sfd_client)
 void command_put(struct packet* shp, struct packet* data, int sfd_client)
 {
 	int x;
-	FILE* f = fopen(shp->buffer, "wb");
+	FILE* f = WriteFileAuto(shp->buffer);
 	shp->type = INFO;
 	shp->comid = PUT;
 	strcpy(shp->buffer, f ? "Everything in order; processing" : "Error opening file for writing on server side.");

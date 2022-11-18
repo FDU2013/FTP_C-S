@@ -54,3 +54,29 @@ void printpacket(struct packet* p, int ptype)
 	fflush(stdout);
 }
 
+bool IsAsciiFile(char* filename){
+	int len = strlen(filename);
+	if(len>4 && strcmp(".txt",filename + len-4)){
+		printf("(debug).txt file\n");
+		return true;
+	}
+	printf("(debug)normal file\n");
+	return false;
+}
+
+FILE* ReadFileAuto(char* filename){
+	if(IsAsciiFile(filename)){
+		return fopen(filename, "r");
+	}
+	else {
+		return fopen(filename, "rb");
+	}
+}
+FILE* WriteFileAuto(char* filename){
+	if(IsAsciiFile(filename)){
+		return fopen(filename, "w");
+	}
+	else {
+		return fopen(filename, "wb");
+	}
+}

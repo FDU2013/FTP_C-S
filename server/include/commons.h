@@ -1,6 +1,8 @@
 #ifndef COMMONS_H
 #define COMMONS_H
 
+#include<stdbool.h>
+
 #include <arpa/inet.h>
 /*
 	for:
@@ -125,6 +127,8 @@ struct packet* ntohp(struct packet*);
 struct packet* htonp(struct packet*);
 
 void printpacket(struct packet*, int);
+FILE* ReadFileAuto(char* filename);
+FILE* WriteFileAuto(char* filename);
 
 #define NCOMMANDS 19
 enum COMMAND
