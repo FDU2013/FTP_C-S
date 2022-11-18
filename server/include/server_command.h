@@ -1,24 +1,29 @@
 #include <commons.h>
 #include <file_transfer_functions.h>
-
 #include <time.h>
 /*
-	for:
-		ctime()
+        for:
+                ctime()
 */
 
 #include <sys/stat.h>
 /*
-	for:
-		stat()
+        for:
+                stat()
 */
 
-#define	ID	"SERVER=> "
+#define ID "SERVER=> "
 
-struct client_info
-{
-	int sfd;
-	int cid;
+struct client_info {
+  int sfd;
+  int cid;
+};
+
+#define TERMINAL_HEAD "SERVER=> "
+
+struct ServerInfo {
+  int socket_fd;
+  int connection_id;
 };
 
 struct client_info* client_info_alloc(int, int);
@@ -30,4 +35,3 @@ void command_get(struct packet*, struct packet*, int);
 void command_put(struct packet*, struct packet*, int);
 void command_mkdir(struct packet*, struct packet*, int);
 void command_rget(struct packet*, struct packet*, int);
-

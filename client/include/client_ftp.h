@@ -1,19 +1,18 @@
 #include <commons.h>
 #include <file_transfer_functions.h>
 
-#define IPSERVER	"127.0.0.1"
-#define	ID		"CLIENT=> "
+#define IPSERVER "127.0.0.1"
+#define ID "CLIENT=> "
 
-#define LENUSERINPUT	1024
+#define LENUSERINPUT 1024
 
-struct command
-{
-	short int id;
-	int npaths;
-	char** paths;
+struct command {
+  short int id;
+  int npaths;
+  char** paths;
 };
 
-struct command* userinputtocommand(char [LENUSERINPUT]);
+struct command* userinputtocommand(char[LENUSERINPUT]);
 
 void printcommand(struct command*);
 
@@ -32,4 +31,3 @@ void command_lmkdir(char*);
 void command_mkdir(struct packet*, struct packet*, int, char*);
 void command_rget(struct packet*, struct packet*, int);
 void command_rput(struct packet*, struct packet*, int);
-
