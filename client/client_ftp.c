@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	bool exit_flag = false;
 	while(!exit_flag)
 	{
-		printf("> ");
+		printf("(ftp_client)> ");
 		fgets(userinput, LENUSERINPUT, stdin);	// in order to give \
 					a filename with spaces, put ':' \
 					instead of ' '. If a command needs \
@@ -88,6 +88,16 @@ int main(int argc, char* argv[])
 					command_lcd(*cmd->paths);
 				else
 					fprintf(stderr, "No path given.\n");
+				break;
+			case DELETE:
+				if(cmd->npaths)
+					command_delete(*cmd->paths);
+				else fprintf(stderr, "No path to file given.\n");
+				break;
+			case LDELETE:
+				if(cmd->npaths)
+					command_ldelete(*cmd->paths);
+				else fprintf(stderr, "No path to file given.\n");
 				break;
 			case PWD:
 				command_pwd(chp, data, sfd_client);
