@@ -1,10 +1,13 @@
 #include <common.h>
 
-// #define extract_filename(filepath) ((strrchr(filepath, '/') != NULL) ?
-// (strrchr(filepath, '/') + 1) : filepath)
+#define extract_filename(filepath) ((strrchr(filepath, '/') != NULL) ? (strrchr(filepath, '/') + 1) : filepath)
 
-void send_EOT(struct Packet*, struct Packet*, int);
-void send_TERM(struct Packet*, struct Packet*, int);
+void sendPacket(struct Packet* packet, int sfd);
+void recvPacket(struct Packet* packet, int sfd);
 
-void send_file(struct Packet*, struct Packet*, int, FILE*);
-void receive_file(struct Packet*, struct Packet*, int, FILE*);
+void send_EOT(int sfd);
+void send_TERM(int sfd);
+
+void sendFile(int, FILE*);
+void receiveFile(int, FILE*);
+

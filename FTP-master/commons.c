@@ -2,7 +2,7 @@
 
 static size_t size_packet = sizeof(struct packet);
 
-void init_packet(struct packet* p)
+void InitPacket(struct packet* p)
 {
 	memset(p, 0, sizeof(struct packet));
 }

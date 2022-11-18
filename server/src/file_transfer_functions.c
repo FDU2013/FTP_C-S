@@ -1,72 +1,74 @@
-#include <file_transfer_functions.h>
+#include <file_transfer.h>
 
 static size_t size_packet = sizeof(struct Packet);
 
-void send_EOT(struct Packet* hp, struct Packet* data, int sfd)
-{
-	int x;
-	hp->type = EOT;
-	data = htonp(hp);
-	if((x = send(sfd, data, size_packet, 0)) != size_packet)
-		throwErrorAndExit("send()", x);
+void sendPacket(struct Packet* packet, int sfd){
+  int expect;
+  htonp(packet);
+  if ((expect = send(sfd, packet, size_packet, 0)) != size_packet)
+    throwErrorAndExit("sendPacket()", expect);
+  ntoh_packet(packet);
+
 }
 
-void send_TERM(struct Packet* hp, struct Packet* data, int sfd)
-{
-	int x;
-	hp->type = TERM;
-	data = htonp(hp);
-	if((x = send(sfd, data, size_packet, 0)) != size_packet)
-		throwErrorAndExit("send()", x);
+void recvPacket(struct Packet* packet, int sfd){
+  int expect;
+  if ((expect = recv(sfd, packet, size_packet, 0)) <= 0)
+    throwErrorAndExit("recvPacket()", except);
+  ntoh_packet(packet);
 }
 
-void send_file(struct Packet* hp, struct Packet* data, int sfd, FILE* f)
-{
-	int x;
-	int i = 0, j = 0;
-	while(!feof(f))
-	{
-		memset(hp->buffer, '\0', sizeof(char) * LENBUFFER);
-		hp->datalen = fread(hp->buffer, 1, LENBUFFER - 1, f);
-		i += hp->datalen;
-		//printpacket(hp, HP);
-		data = htonp(hp);
-		if((x = send(sfd, data, size_packet, 0)) != size_packet)
-			throwErrorAndExit("send()", x);
-		j++;
-	}
-	fprintf(stderr, "%d byte(s) read.\n", i);
-	fprintf(stderr, "%d data packet(s) sent.\n", j);
-	fflush(stderr);
+void send_EOT(int sfd) {
+  struct Packet* packet = malloc(size_packet);
+  packet->type = EOT;
+  sendPacket(packet,sfd);
+  free(packet);
 }
 
-void receive_file(struct Packet* hp, struct Packet* data, int sfd, FILE* f)
-{
-	int x;
-	int i = 0, j = 0;
-	if((x = recv(sfd, data, size_packet, 0)) <= 0)
-		throwErrorAndExit("recv()", x);
-	j++;
-	hp = ntohp(data);
-	//printpacket(hp, HP);
-	while(hp->type == DATA)
-	{
-		i += fwrite(hp->buffer, 1, hp->datalen, f);
-		if((x = recv(sfd, data, size_packet, 0)) <= 0)
-			throwErrorAndExit("recv()", x);
-		j++;
-		hp = ntohp(data);
-		//printpacket(hp, HP);
-	}
-	fprintf(stderr, "%d data packet(s) received.\n", --j);	// j decremented because the last packet is EOT.
-	fprintf(stderr, "%d byte(s) written.\n", i);
-	if(hp->type == EOT)
-		return;
-	else
-	{
-		fprintf(stderr, "Error occured while downloading remote file.\n");
-		exit(2);
-	}
-	fflush(stderr);
+void send_TERM(int sfd) {
+  struct Packet* packet = malloc(size_packet);
+  hostPacket->type = TERM;
+  sendPacket(packet,sfd);
+  free(packet);
 }
 
+void sendFile(int sfd, FILE* f) {
+  struct Packet* packet = malloc(size_packet);
+  int cntBytes = 0, cntPacket = 0;
+  //while循环里面每次send一个packet
+  while (!feof(f)) {
+    memset(packet->buffer, 0, sizeof(char) * BUF_SIZE);
+    packet->data_size = fread(hostPacket->buffer, 1, BUF_SIZE - 1, f);
+    cntBytes += packet->data_size;
+    cntPacket++;
+    sendPacket(packet,sfd);
+    //记得转换回去给while循环的下一个阶段用
+  }
+  fprintf(stderr, "%d byte(s) read.\n", cntBytes);
+  fprintf(stderr, "%d data packet(s) sent.\n", cntPacket);
+  fflush(stderr);
+  free(packet);
+}
+
+void receiveFile(int sfd, FILE* f) {
+  struct Packet* packet = malloc(size_packet);
+  int cntBytes = 0, cntPacket = 0;
+  recvPacket(packet,sfd);
+  // printpacket(hostPacket, HP);
+  while (hostPacket->type == DATA) {
+    cntBytes += fwrite(hostPacket->buffer, 1, hostPacket->data_size, f);
+    cntPacket++;
+    recvPacket(packet,sfd);
+    // printpacket(hostPacket, HP);
+  }
+  fprintf(stderr, "%d data packet(s) received.\n",cntPacket);  // j decremented because the last packet is EOT.
+  fprintf(stderr, "%d byte(s) written.\n", i);
+  if (packet->type == EOT)
+    return;
+  else {
+    fprintf(stderr, "Error occured while downloading remote file.\n");
+    exit(2);
+  }
+  fflush(stderr);
+  free(packet);
+}

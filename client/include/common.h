@@ -112,7 +112,6 @@ void InitPacket(struct Packet*);
 void ntoh_packet(struct Packet*);
 void hton_packet(struct Packet*);
 
-// void printpacket(struct Packet*, int);
 FILE* ReadFileAuto(char* filename);
 FILE* WriteFileAuto(char* filename);
 

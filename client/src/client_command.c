@@ -81,7 +81,7 @@ void printcommand(struct command* c) {
 
 void PwdCommand(int sfd_client) {
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kPwd;
@@ -96,7 +96,7 @@ void PwdCommand(int sfd_client) {
 
 void CdCommand(int sfd_client, char* path) {
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kCd;
@@ -128,7 +128,7 @@ void LsLocalCommand(char* lpwd) {
 void LsCommand(int sfd_client) {
 
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kLs;
@@ -151,7 +151,7 @@ void GetCommand(int sfd_client, char* filename) {
   }
 
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kGet;
@@ -176,7 +176,7 @@ void PutCommand(int sfd_client, char* filename) {
   }
 
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kPut;
@@ -200,7 +200,7 @@ void PutCommand(int sfd_client, char* filename) {
 
 void MkdirLocalCommand(int sfd_client, char* dirname) {
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kMkdir;
@@ -236,7 +236,7 @@ void CdLocalCommand(char* path) {
 
 void DeleteCommand(int sfd_client, char* filename) {
   struct Packet* packet = malloc(size_packet);
-  init_packet(packet);
+  InitPacket(packet);
   packet->type = REQU;
   packet->connection_id = -1;
   packet->command_type = kDelete;

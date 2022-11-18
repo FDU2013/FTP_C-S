@@ -114,7 +114,7 @@ void printcommand(struct command* c)
 void command_pwd(struct packet* chp, struct packet* data, int sfd_client)
 {
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = PWD;
@@ -133,7 +133,7 @@ void command_pwd(struct packet* chp, struct packet* data, int sfd_client)
 void command_cd(struct packet* chp, struct packet* data, int sfd_client, char* path)
 {
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = CD;
@@ -164,7 +164,7 @@ void command_lls(char* lpwd)
 void command_ls(struct packet* chp, struct packet* data, int sfd_client)
 {
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = LS;
@@ -194,7 +194,7 @@ void command_get(struct packet* chp, struct packet* data, int sfd_client, char* 
 		return;
 	}
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = GET;
@@ -225,7 +225,7 @@ void command_put(struct packet* chp, struct packet* data, int sfd_client, char* 
 		return;
 	}
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = PUT;
@@ -280,7 +280,7 @@ void command_mput(struct packet* chp, struct packet* data, int sfd_client, int n
 void command_mgetwild(struct packet* chp, struct packet* data, int sfd_client)
 {
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = LS;
@@ -357,7 +357,7 @@ void command_rget(struct packet* chp, struct packet* data, int sfd_client)
 {
 	char temp[LENBUFFER];
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = RGET;
@@ -401,7 +401,7 @@ void command_rget(struct packet* chp, struct packet* data, int sfd_client)
 void command_mkdir(struct packet* chp, struct packet* data, int sfd_client, char* dirname)
 {
 	int x;
-	init_packet(chp);
+	InitPacket(chp);
 	chp->type = REQU;
 	chp->conid = -1;
 	chp->comid = MKDIR;
