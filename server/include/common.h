@@ -90,7 +90,8 @@
 // #define DATAPORT (PORTSERVER + 1)
 
 // enum TYPE { REQU, DONE, INFO, TERM, DATA, EOT };
-enum PacketType { kRequest, kResponse, kData, kEnd, kError };
+typedef short PacketType;
+enum { kRequest, kResponse, kData, kEnd, kError };
 
 #define throwErrorAndExit(e, x)   \
   do {                            \
@@ -132,7 +133,8 @@ FILE* ReadFileAuto(char* filename);
 FILE* WriteFileAuto(char* filename);
 
 #define COMMAND_NUM 13
-enum CommandType {
+typedef short CommandType;
+enum {
   kGet,
   kPut,
   kCd,
