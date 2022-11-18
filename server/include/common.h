@@ -1,9 +1,8 @@
 #ifndef COMMONS_H
 #define COMMONS_H
 
-#include<stdbool.h>
-
 #include <arpa/inet.h>
+#include <stdbool.h>
 /*
         for:
                 htons()
@@ -85,12 +84,12 @@
 
 #define DEBUG 1
 
-#define PORTSERVER 8487
+// #define PORTSERVER 8487
 #define SERVER_PORT 21
-#define CONTROLPORT PORTSERVER
-#define DATAPORT (PORTSERVER + 1)
+// #define CONTROLPORT PORTSERVER
+// #define DATAPORT (PORTSERVER + 1)
 
-enum TYPE { REQU, DONE, INFO, TERM, DATA, EOT };
+// enum TYPE { REQU, DONE, INFO, TERM, DATA, EOT };
 enum PacketType { kRequest, kResponse, kData, kEnd, kError };
 
 #define throwErrorAndExit(e, x)   \
@@ -100,15 +99,15 @@ enum PacketType { kRequest, kResponse, kData, kEnd, kError };
     exit(-1);                     \
   } while (0)
 
-#define LENBUFFER \
-  504  // so as to make the whole packet well-rounded ( = 512 bytes)
-struct packet {
-  short int conid;
-  short int type;
-  short int comid;
-  short int datalen;
-  char buffer[LENBUFFER];
-};
+// #define LENBUFFER \
+//   504  // so as to make the whole packet well-rounded ( = 512 bytes)
+// struct packet {
+//   short int conid;
+//   short int type;
+//   short int comid;
+//   short int datalen;
+//   char buffer[LENBUFFER];
+// };
 
 #define PACKET_SIZE 512
 #define BUF_SIZE                                              \
@@ -123,60 +122,30 @@ struct Packet {
   char buf[BUF_SIZE];
 };
 
-void init_packet(struct packet*);
+void InitPacket(struct Packet*);
 
-struct packet* ntohp(struct packet*);
-struct packet* htonp(struct packet*);
+struct Packet* ntoh_packet(struct Packet*);
+struct Packet* hton_packet(struct Packet*);
 
-void printpacket(struct packet*, int);
+// void printpacket(struct packet*, int);
 FILE* ReadFileAuto(char* filename);
 FILE* WriteFileAuto(char* filename);
 
-#define NCOMMANDS 19
-enum COMMAND {
-  GET,
-  PUT,
-  MGET,
-  MPUT,
-  CD,
-  LCD,
-  MGETWILD,
-  MPUTWILD,
-  DIR_,  // _ to avoid conflict with directory pointer DIR
-  LDIR,
-  LS,
-  LLS,
-  MKDIR,
-  LMKDIR,
-  RGET,
-  RPUT,
-  PWD,
-  LPWD,
-  EXIT
-};  // any change made here should also be \
-				replicated accordingly in the commandlist \
-				2D array in client_ftp_fucntions.c
-#define COMMAND_NUM 19
+#define COMMAND_NUM 13
 enum CommandType {
-  GET,
-  PUT,
-  MGET,
-  MPUT,
-  CD,
-  LCD,
-  MGETWILD,
-  MPUTWILD,
-  DIR_,  // _ to avoid conflict with directory pointer DIR
-  LDIR,
-  LS,
-  LLS,
-  MKDIR,
-  LMKDIR,
-  RGET,
-  RPUT,
-  PWD,
-  LPWD,
-  EXIT
+  kGet,
+  kPut,
+  kCd,
+  kLcd,
+  kDelete,
+  kLdelete,
+  kLs,
+  kLls,
+  kMkdir,
+  kLmkdir,
+  kPwd,
+  kLpwd,
+  kExit
 };
 
 #endif

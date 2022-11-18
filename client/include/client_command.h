@@ -1,5 +1,5 @@
-#include <commons.h>
-#include <file_transfer_functions.h>
+#include <common.h>
+#include <file_transfer.h>
 
 #define IPSERVER "127.0.0.1"
 #define ID "CLIENT=> "
