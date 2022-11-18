@@ -103,9 +103,9 @@ enum { kRequest, kResponse, kData, kEnd, kError };
 // #define LENBUFFER \
 //   504  // so as to make the whole packet well-rounded ( = 512 bytes)
 // struct Packet {
-//   short int conid;
+//   short int connection_id;
 //   short int type;
-//   short int comid;
+//   short int command_type;
 //   short int datalen;
 //   char buffer[LENBUFFER];
 // };

@@ -7,10 +7,7 @@ int main(int argc, char* argv[]) {
   size_t size_sockaddr = sizeof(struct sockaddr),
          size_packet = sizeof(struct Packet);
   short int connection_id;
-  struct Packet* chp =
-      (struct Packet*)malloc(size_packet);  // client host packet
-  init_packet(chp);
-  struct Packet* data;  // network packet
+  
 
   if ((x = sfd_client = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     throwErrorAndExit("socket()", x);
@@ -46,105 +43,75 @@ int main(int argc, char* argv[]) {
     if (!cmd) continue;
     // printcommand(cmd);
     switch (cmd->id) {
-      case GET:
+      case kGet:
         if (cmd->npaths)
-          command_get(chp, data, sfd_client, *cmd->paths);
+          GetCommand(chp, data, sfd_client, *cmd->paths);
         else
           fprintf(stderr, "No path to file given.\n");
         break;
-      case PUT:
+      case kPut:
         if (cmd->npaths)
-          command_put(chp, data, sfd_client, *cmd->paths);
+          PutCommand(chp, data, sfd_client, *cmd->paths);
         else
           fprintf(stderr, "No path to file given.\n");
         break;
-      case MGET:
+      case kCd:
         if (cmd->npaths)
-          command_mget(chp, data, sfd_client, cmd->npaths, cmd->paths);
-        else
-          fprintf(stderr, "No path to file given.\n");
-        break;
-      case MPUT:
-        if (cmd->npaths)
-          command_mput(chp, data, sfd_client, cmd->npaths, cmd->paths);
-        else
-          fprintf(stderr, "No path to file given.\n");
-        break;
-      case MGETWILD:
-        command_mgetwild(chp, data, sfd_client);
-        break;
-      case MPUTWILD:
-        if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-        command_mputwild(chp, data, sfd_client, lpwd);
-        break;
-      case CD:
-        if (cmd->npaths)
-          command_cd(chp, data, sfd_client, *cmd->paths);
+          CdCommand(chp, data, sfd_client, *cmd->paths);
         else
           fprintf(stderr, "No path given.\n");
         break;
-      case LCD:
+      case kLcd:
         if (cmd->npaths)
-          command_lcd(*cmd->paths);
+          CdLocalCommand(*cmd->paths);
         else
           fprintf(stderr, "No path given.\n");
         break;
-      case DELETE:
+      case kDelete:
         if (cmd->npaths)
-          command_delete(*cmd->paths);
+          DeleteCommand(*cmd->paths);
         else
           fprintf(stderr, "No path to file given.\n");
         break;
-      case LDELETE:
+      case kLdelete:
         if (cmd->npaths)
-          command_ldelete(*cmd->paths);
+          DeleteLocalCommand(*cmd->paths);
         else
           fprintf(stderr, "No path to file given.\n");
         break;
-      case PWD:
-        command_pwd(chp, data, sfd_client);
+      case kPwd:
+        PwdCommand(chp, data, sfd_client);
         break;
       case LPWD:
         if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
         printf("%s\n", lpwd);
         break;
-      case DIR_:
-      case LS:
-        command_ls(chp, data, sfd_client);
+      case kLs:
+        LsCommand(chp, data, sfd_client);
         break;
-      case LDIR:
-      case LLS:
+      case kLls:
         if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-        command_lls(lpwd);
+        LsLocalCommand(lpwd);
         break;
-      case MKDIR:
+      case kMkdir:
         if (cmd->npaths)
-          command_mkdir(chp, data, sfd_client, *cmd->paths);
+          MkdirLocalCommand(chp, data, sfd_client, *cmd->paths);
         else
           fprintf(stderr, "No path to directory given.\n");
         break;
-      case LMKDIR:
+      case kLmkdir:
         if (cmd->npaths)
-          command_lmkdir(*cmd->paths);
+          LmkdirCommand(*cmd->paths);
         else
           fprintf(stderr, "No path to directory given.\n");
         break;
-      case RGET:
-        if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-        command_rget(chp, data, sfd_client);
-        if ((x = chdir(lpwd)) == -1) fprintf(stderr, "Wrong path.\n");
-        break;
-      case RPUT:
-        if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-        command_rput(chp, data, sfd_client);
-        if ((x = chdir(lpwd)) == -1) fprintf(stderr, "Wrong path.\n");
-        break;
-      case EXIT:
+      case kExit:
         exit_flag = true;
         break;
       default:
         // display error
         break;
+      free(cmd);
     }
   }
 

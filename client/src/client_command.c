@@ -5,21 +5,13 @@ static size_t size_packet = sizeof(struct Packet);
 static const char commandlist[NCOMMANDS][10] = {
     "get",      "put",
 
-    "mget",     "mput",
-
     "cd",       "lcd",
 
     "delete",   "ldelete",
 
-    "mgetwild", "mputwild",
-
-    "dir",      "ldir",
-
     "ls",       "lls",
 
     "mkdir",    "lmkdir",
-
-    "rget",     "rput",
 
     "pwd",      "lpwd",
 
@@ -67,10 +59,6 @@ struct command* userinputtocommand(char s[LENUSERINPUT]) {
     else
       append_path(cmd, token);
   }
-  if (cmd->id == MGET && !strcmp(*cmd->paths, "*"))
-    cmd->id = MGETWILD;
-  else if (cmd->id == MPUT && !strcmp(*cmd->paths, "*"))
-    cmd->id = MPUTWILD;
   if (cmd->id != -1)
     return cmd;
   else {
@@ -91,45 +79,40 @@ void printcommand(struct command* c) {
   printf("\n");
 }
 
-void command_pwd(struct Packet* chp, struct Packet* data, int sfd_client) {
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = PWD;
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
-  if (chp->type == DATA && chp->comid == PWD && strlen(chp->buffer) > 0)
+void PwdCommand(int sfd_client) {
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kPwd;
+  sendPacket(packet);
+  recvPacket(packet);
+  if (packet->type == DATA && packet->command_type == kPwd && strlen(packet->buffer) > 0)
     printf("%s\n", chp->buffer);
   else
     fprintf(stderr, "Error retrieving information.\n");
+  free(packet);
 }
 
-void command_cd(struct Packet* chp, struct Packet* data, int sfd_client,
-                char* path) {
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = CD;
-  strcpy(chp->buffer, path);
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
-  if (chp->type == INFO && chp->comid == CD && !strcmp(chp->buffer, "success"))
+void CdCommand(int sfd_client, char* path) {
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kCd;
+  strcpy(packet->buffer, path);
+  sendPacket(packet);
+  recvPacket(packet);
+  strcpy(packet->buffer, path);
+  if (packet->type == INFO && packet->command_type == kCd && !strcmp(packet->buffer, "success"))
     ;
   else
     fprintf(stderr, "Error executing command on the server.\n");
+
+  free(packet);
 }
 
-void command_lls(char* lpwd) {
+void LsLocalCommand(char* lpwd) {
   DIR* d = opendir(lpwd);
   if (!d) throwErrorAndExit("opendir()", (int)d);
   struct dirent* e;
@@ -142,49 +125,42 @@ void command_lls(char* lpwd) {
   closedir(d);
 }
 
-void command_ls(struct Packet* chp, struct Packet* data, int sfd_client) {
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = LS;
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  while (chp->type != EOT) {
-    if (chp->type == DATA && chp->comid == LS && strlen(chp->buffer))
+void LsCommand(int sfd_client) {
+
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kLs;
+
+  sendPacket(packet);
+  recvPacket(packet);
+  while (packet->type != EOT) {
+    if (packet->type == DATA && packet->command_type == kLs && strlen(packet->buffer))
       printf("%s\n", chp->buffer);
-    /*
-    else
-            fprintf(stderr, "Error executing command on the server.\n");
-    */
-    if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-      throwErrorAndExit("recv()", x);
-    chp = ntohp(data);
+    recvPacket(packet);
   }
+  free(packet);
 }
 
-void command_get(struct Packet* chp, struct Packet* data, int sfd_client,
-                 char* filename) {
+void GetCommand(int sfd_client, char* filename) {
   FILE* f = WriteFileAuto(filename);
   if (!f) {
     fprintf(stderr, "File could not be opened for writing. Aborting...\n");
     return;
   }
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = GET;
-  strcpy(chp->buffer, filename);
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
+
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kGet;
+  strcpy(packet->buffer, filename);
+
+  sendPacket(packet);
+  recvPacket(packet);
   // printpacket(chp, HP);
-  if (chp->type == INFO && chp->comid == GET && strlen(chp->buffer)) {
+  if (packet->type == INFO && packet->command_type == kGet && strlen(packet->buffer)) {
     printf("%s\n", chp->buffer);
     receive_file(chp, data, sfd_client, f);
     fclose(f);
@@ -192,190 +168,58 @@ void command_get(struct Packet* chp, struct Packet* data, int sfd_client,
     fprintf(stderr, "Error getting remote file : <%s>\n", filename);
 }
 
-void command_put(struct Packet* chp, struct Packet* data, int sfd_client,
-                 char* filename) {
+void PutCommand(int sfd_client, char* filename) {
   FILE* f = ReadFileAuto(filename);  // Yo!
   if (!f) {
     fprintf(stderr, "File could not be opened for reading. Aborting...\n");
     return;
   }
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = PUT;
-  strcpy(chp->buffer, filename);
-  hton_packet(chp);
-  if ((x = send(sfd_client, chp, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, chp, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  ntoh_packet(chp);
-  // printpacket(chp, HP);
-  if (chp->type == INFO && chp->comid == PUT && strlen(chp->buffer)) {
+
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kPut;
+  strcpy(packet->buffer, filename);
+
+  sendPacket(packet);
+  recvPacket(packet);
+
+  if (packet->type == INFO && packet->command_type == kPut && strlen(packet->buffer)) {
     printf("%s\n", chp->buffer);
-    chp->type = DATA;
-    send_file(chp, data, sfd_client, f);
-    fclose(f);
+    send_file(sfd_client, f);
   } else
     fprintf(stderr, "Error sending file.\n");
-  send_EOT(chp, data, sfd_client);
+  free(packet);
+  fclose(f);
+  send_EOT(sfd_client);
+
 }
 
-void command_mget(struct Packet* chp, struct Packet* data, int sfd_client,
-                  int n, char** filenames) {
-  int i;
-  char* filename;
-  for (i = 0; i < n; i++) {
-    filename = *(filenames + i);
-    printf("Processing file %d of %d:\t%s\n", i + 1, n, filename);
-    command_get(chp, data, sfd_client, filename);
-  }
-  if (i != n) fprintf(stderr, "Not all files could be downloaded.\n");
-}
 
-void command_mput(struct Packet* chp, struct Packet* data, int sfd_client,
-                  int n, char** filenames) {
-  int i;
-  char* filename;
-  for (i = 0; i < n; i++) {
-    filename = *(filenames + i);
-    printf("Processing file %d of %d:\t%s\n", i + 1, n, filename);
-    command_put(chp, data, sfd_client, filename);
-  }
-  if (i != n) fprintf(stderr, "Not all files could be uploaded.\n");
-}
 
-void command_mgetwild(struct Packet* chp, struct Packet* data, int sfd_client) {
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = LS;
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  struct command* cmd = (struct command*)malloc(sizeof(struct command));
-  cmd->id = MGETWILD;
-  cmd->npaths = 0;
-  cmd->paths = NULL;
-  while (chp->type != EOT) {
-    if (chp->type == DATA && chp->comid == LS && strlen(chp->buffer))
-      if (*chp->buffer == 'F') append_path(cmd, chp->buffer + 6);
-    if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-      throwErrorAndExit("recv()", x);
-    chp = ntohp(data);
-  }
-  command_mget(chp, data, sfd_client, cmd->npaths, cmd->paths);
-}
-
-void command_mputwild(struct Packet* chp, struct Packet* data, int sfd_client,
-                      char* lpwd) {
-  DIR* d = opendir(lpwd);
-  if (!d) throwErrorAndExit("opendir()", (int)d);
-  struct dirent* e;
-  struct command* cmd = (struct command*)malloc(sizeof(struct command));
-  cmd->id = MPUTWILD;
-  cmd->npaths = 0;
-  cmd->paths = NULL;
-  while (e = readdir(d))
-    if (e->d_type == 8) append_path(cmd, e->d_name);
-  closedir(d);
-  command_mput(chp, data, sfd_client, cmd->npaths, cmd->paths);
-}
-
-void command_rput(struct Packet* chp, struct Packet* data, int sfd_client) {
-  static char lpwd[LENBUFFER];
-  if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-  int x;
-  DIR* d = opendir(lpwd);
-  if (!d) throwErrorAndExit("opendir()", (int)d);
-  struct dirent* e;
-  struct command* cmd = (struct command*)malloc(sizeof(struct command));
-  cmd->id = RPUT;
-  cmd->npaths = 0;
-  cmd->paths = NULL;
-  while (e = readdir(d))
-    if (e->d_type == 8)
-      append_path(cmd, e->d_name);
-    else if (e->d_type == 4 && strcmp(e->d_name, ".") &&
-             strcmp(e->d_name, "..")) {
-      command_mkdir(chp, data, sfd_client, e->d_name);
-
-      command_cd(chp, data, sfd_client, e->d_name);
-      command_lcd(e->d_name);
-
-      command_rput(chp, data, sfd_client);
-
-      command_cd(chp, data, sfd_client, "..");
-      command_lcd("..");
-    }
-  closedir(d);
-  command_mput(chp, data, sfd_client, cmd->npaths, cmd->paths);
-}
-
-void command_rget(struct Packet* chp, struct Packet* data, int sfd_client) {
-  char temp[LENBUFFER];
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = RGET;
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
-  // printpacket(chp, HP);
-  while (chp->type == REQU) {
-    if (chp->comid == LMKDIR) {
-      strcpy(temp, chp->buffer);
-      command_lmkdir(temp);
-    } else if (chp->comid == LCD) {
-      strcpy(temp, chp->buffer);
-      command_lcd(temp);
-    } else if (chp->comid == GET) {
-      strcpy(temp, chp->buffer);
-      command_get(chp, data, sfd_client, temp);
-    }
-
-    if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-      throwErrorAndExit("recv()", x);
-    chp = ntohp(data);
-    // printpacket(chp, HP);
-  }
-  if (chp->type == EOT)
-    printf("Transmission successfully ended.\n");
-  else
-    fprintf(stderr, "There was a problem completing the request.\n");
-}
-
-void command_mkdir(struct Packet* chp, struct Packet* data, int sfd_client,
-                   char* dirname) {
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = MKDIR;
+void MkdirLocalCommand(int sfd_client, char* dirname) {
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kMkdir;
   strcpy(chp->buffer, dirname);
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
-  if (chp->type == INFO && chp->comid == MKDIR) {
-    if (!strcmp(chp->buffer, "success"))
+
+  send(packet);
+  recvPacket(packet);
+
+  if (packet->type == INFO && packet->command_type == MKDIR) {
+    if (!strcmp(packet->buffer, "success"))
       printf("Created directory on server.\n");
-    else if (!strcmp(chp->buffer, "already exists"))
+    else if (!strcmp(packet->buffer, "already exists"))
       printf("Directory already exitst on server.\n");
   } else
     fprintf(stderr, "Error executing command on the server.\n");
+  free(packet);
 }
 
-void command_lmkdir(char* dirname) {
+void LmkdirCommand(char* dirname) {
   DIR* d = opendir(dirname);
   if (d) {
     printf("Directory already exists.\n");
@@ -386,30 +230,27 @@ void command_lmkdir(char* dirname) {
     printf("Created directory.\n");
 }
 
-void command_lcd(char* path) {
+void CdLocalCommand(char* path) {
   if (chdir(path) == -1) fprintf(stderr, "Wrong path : <%s>\n", path);
 }
 
-void command_delete(struct Packet* chp, struct Packet* data, int sfd_client,
-                    char* filename) {
-  int x;
-  init_packet(chp);
-  chp->type = REQU;
-  chp->conid = -1;
-  chp->comid = DELETE;
-  strcpy(chp->buffer, filename);
-  data = htonp(chp);
-  if ((x = send(sfd_client, data, size_packet, 0)) != size_packet)
-    throwErrorAndExit("send()", x);
-  if ((x = recv(sfd_client, data, size_packet, 0)) <= 0)
-    throwErrorAndExit("recv()", x);
-  chp = ntohp(data);
+void DeleteCommand(int sfd_client, char* filename) {
+  struct Packet* packet = malloc(size_packet);
+  init_packet(packet);
+  packet->type = REQU;
+  packet->connection_id = -1;
+  packet->command_type = kDelete;
+  strcpy(packet->buffer, filename);
 
-  if (chp->type == INFO && chp->comid == DELETE &&
-      !strcmp(chp->buffer, "success"))
+  send(packet);
+  recvPacket(packet);
+
+  if (packet->type == INFO && packet->command_type == DELETE &&
+      !strcmp(packet->buffer, "success"))
     ;
   else
     fprintf(stderr, "Error executing command on the server.\n");
+  free(packet);
 }
 
-void command_ldelete(char* path) {}
+void DeleteLocalCommand(char* path) {}

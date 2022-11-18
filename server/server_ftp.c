@@ -72,10 +72,10 @@ void* serve_client(void* info) {
 
     if (shp->type == TERM) break;
 
-    if (shp->conid == -1) shp->conid = connection_id;
+    if (shp->connection_id == -1) shp->connection_id = connection_id;
 
     if (shp->type == REQU) {
-      switch (shp->comid) {
+      switch (shp->command_type) {
         case PWD:
           if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
           command_pwd(shp, data, sfd_client, lpwd);

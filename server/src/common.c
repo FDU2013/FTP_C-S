@@ -8,9 +8,9 @@ struct Packet* ntohp(struct Packet* np) {
   struct Packet* hp = (struct Packet*)malloc(size_packet);
   memset(hp, 0, size_packet);
 
-  hp->conid = ntohs(np->conid);
+  hp->connection_id = ntohs(np->connection_id);
   hp->type = ntohs(np->type);
-  hp->comid = ntohs(np->comid);
+  hp->command_type = ntohs(np->command_type);
   hp->datalen = ntohs(np->datalen);
   memcpy(hp->buffer, np->buffer, LENBUFFER);
 
@@ -21,9 +21,9 @@ struct Packet* htonp(struct Packet* hp) {
   struct Packet* np = (struct Packet*)malloc(size_packet);
   memset(np, 0, size_packet);
 
-  np->conid = ntohs(hp->conid);
+  np->connection_id = ntohs(hp->connection_id);
   np->type = ntohs(hp->type);
-  np->comid = ntohs(hp->comid);
+  np->command_type = ntohs(hp->command_type);
   np->datalen = ntohs(hp->datalen);
   memcpy(np->buffer, hp->buffer, LENBUFFER);
 
@@ -38,9 +38,9 @@ void printpacket(struct Packet* p, int ptype) {
   else
     printf("NETWORK PACKET\n");
 
-  printf("conid = %d\n", p->conid);
+  printf("connection_id = %d\n", p->connection_id);
   printf("type = %d\n", p->type);
-  printf("comid = %d\n", p->comid);
+  printf("command_type = %d\n", p->command_type);
   printf("datalen = %d\n", p->datalen);
   printf("buffer = %s\n", p->buffer);
 

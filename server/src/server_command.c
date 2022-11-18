@@ -53,7 +53,7 @@ void command_get(struct Packet* shp, struct Packet* data, int sfd_client)
 	int x;
 	FILE* f = ReadFileAuto(shp->buffer);	// Yo!
 	shp->type = INFO;
-	shp->comid = GET;
+	shp->command_type = GET;
 	strcpy(shp->buffer, f ? "File found; processing" : "Error opening file.");
 	//printpacket(shp, HP);
 	data = htonp(shp);
@@ -73,7 +73,7 @@ void command_put(struct Packet* shp, struct Packet* data, int sfd_client)
 	int x;
 	FILE* f = WriteFileAuto(shp->buffer);
 	shp->type = INFO;
-	shp->comid = PUT;
+	shp->command_type = PUT;
 	strcpy(shp->buffer, f ? "Everything in order; processing" : "Error opening file for writing on server side.");
 	//printpacket(shp, HP);
 	data = htonp(shp);
@@ -124,7 +124,7 @@ void command_rget(struct Packet* shp, struct Packet* data, int sfd_client)
 		if(e->d_type == 4 && strcmp(e->d_name, ".") && strcmp(e->d_name, ".."))
 		{
 			shp->type = REQU;
-			shp->comid = LMKDIR;
+			shp->command_type = LMKDIR;
 			strcpy(shp->buffer, e->d_name);
 			data = htonp(shp);
 			//fprintf(stderr, "LMKDIR: e->d_name = <%s>\n", e->d_name);
@@ -133,7 +133,7 @@ void command_rget(struct Packet* shp, struct Packet* data, int sfd_client)
 				throwErrorAndExit("send()", x);
 			
 			shp->type = REQU;
-			shp->comid = LCD;
+			shp->command_type = LCD;
 			strcpy(shp->buffer, e->d_name);
 			data = htonp(shp);
 			//fprintf(stderr, "LCD: e->d_name = <%s>\n", e->d_name);
@@ -146,7 +146,7 @@ void command_rget(struct Packet* shp, struct Packet* data, int sfd_client)
 			command_rget(shp, data, sfd_client);
 			
 			shp->type = REQU;
-			shp->comid = LCD;
+			shp->command_type = LCD;
 			strcpy(shp->buffer, "..");
 			data = htonp(shp);
 			//fprintf(stderr, "LCD: <..>\n");
@@ -159,7 +159,7 @@ void command_rget(struct Packet* shp, struct Packet* data, int sfd_client)
 		else if(e->d_type == 8)
 		{
 			shp->type = REQU;
-			shp->comid = GET;
+			shp->command_type = GET;
 			strcpy(shp->buffer, e->d_name);
 			data = htonp(shp);
 			//fprintf(stderr, "GET: e->d_name = <%s>\n", e->d_name);
@@ -169,7 +169,7 @@ void command_rget(struct Packet* shp, struct Packet* data, int sfd_client)
 			if((x = recv(sfd_client, data, size_packet, 0)) == 0)
 				throwErrorAndExit("recv()", x);
 			shp = ntohp(data);
-			if(shp->type == REQU && shp->comid == GET)
+			if(shp->type == REQU && shp->command_type == GET)
 				command_get(shp, data, sfd_client);
 		}
 	closedir(d);

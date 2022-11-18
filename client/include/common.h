@@ -83,13 +83,7 @@
 #include <dirent.h>
 
 #define DEBUG 1
-
-// #define PORTSERVER 8487
 #define SERVER_PORT 21
-// #define CONTROLPORT PORTSERVER
-// #define DATAPORT (PORTSERVER + 1)
-
-// enum TYPE { REQU, DONE, INFO, TERM, DATA, EOT };
 typedef short PacketType;
 enum { kRequest, kResponse, kData, kEnd, kError };
 
@@ -100,15 +94,6 @@ enum { kRequest, kResponse, kData, kEnd, kError };
     exit(-1);                     \
   } while (0)
 
-// #define LENBUFFER \
-//   504  // so as to make the whole packet well-rounded ( = 512 bytes)
-// struct Packet {
-//   short int conid;
-//   short int type;
-//   short int comid;
-//   short int datalen;
-//   char buffer[LENBUFFER];
-// };
 
 #define PACKET_SIZE 512
 #define BUF_SIZE                                              \
