@@ -19,24 +19,24 @@ static const char commandlist[COMMAND_NUM][10] = {
 				replicated accordingly in the COMMANDS \
 				enum in commons.h
 
-static void append_path(struct command *c, char *s)
+static void appendPath(struct command *c, char *s)
 {
   c->npaths++;
-  char **temppaths = (char **)malloc(c->npaths * sizeof(char *));
+  char **temp_paths = (char **)malloc(c->npaths * sizeof(char *));
   if (c->npaths > 1)
-    memcpy(temppaths, c->paths, (c->npaths - 1) * sizeof(char *));
+    memcpy(temp_paths, c->paths, (c->npaths - 1) * sizeof(char *));
 
   char *temps = (char *)malloc((strlen(s) + 1) * sizeof(char));
   int i;
   for (i = 0; *(temps + i) = *(s + i) == ':' ? ' ' : *(s + i); i++)
     ;
 
-  *(temppaths + c->npaths - 1) = temps;
+  *(temp_paths + c->npaths - 1) = temps;
 
-  c->paths = temppaths;
+  c->paths = temp_paths;
 }
 
-struct command *userinputtocommand(char s[LENUSERINPUT])
+struct command *inputCommand(char s[LENUSERINPUT])
 {
   struct command *cmd = (struct command *)malloc(sizeof(struct command));
   cmd->type = -1;
@@ -63,7 +63,7 @@ struct command *userinputtocommand(char s[LENUSERINPUT])
 			 associated with the "if inside the for loop". \
 			 #BUGFIX
     else
-      append_path(cmd, token);
+      appendPath(cmd, token);
   }
   if (cmd->type != -1)
     return cmd;
@@ -115,7 +115,6 @@ void CdCommand(int sfd_client, char *path)
   strcpy(packet->buf, path);
   sendPacket(packet, sfd_client);
   recvPacket(packet, sfd_client);
-  strcpy(packet->buf, path);
   if (packet->type == kResponse && packet->command_type == kCd && !strcmp(packet->buf, "success"))
     ;
   else
@@ -215,7 +214,7 @@ void PutCommand(int sfd_client, char *filename)
     fprintf(stderr, "Error sending file.\n");
   free(packet);
   fclose(f);
-  send_EOT(sfd_client);
+  sendEOT(sfd_client);
 }
 
 void MkdirLocalCommand(int sfd_client, char *dirname)

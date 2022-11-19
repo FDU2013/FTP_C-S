@@ -21,7 +21,7 @@ void hton_packet(struct Packet *hostPacket)
   hostPacket->data_size = htons(hostPacket->data_size);
 }
 
-bool IsAsciiFile(char *filename)
+bool isAsciiFile(char *filename)
 {
   int len = strlen(filename);
   if (len > 4 && strcmp(".txt", filename + len - 4) == 0)
@@ -35,7 +35,7 @@ bool IsAsciiFile(char *filename)
 
 FILE *ReadFileAuto(char *filename)
 {
-  if (IsAsciiFile(filename))
+  if (isAsciiFile(filename))
   {
     return fopen(filename, "r");
   }
@@ -46,7 +46,7 @@ FILE *ReadFileAuto(char *filename)
 }
 FILE *WriteFileAuto(char *filename)
 {
-  if (IsAsciiFile(filename))
+  if (isAsciiFile(filename))
   {
     return fopen(filename, "w");
   }

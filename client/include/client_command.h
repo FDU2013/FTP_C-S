@@ -12,7 +12,7 @@ struct command {
   char** paths;
 };
 
-struct command* userinputtocommand(char[LENUSERINPUT]);
+struct command* inputCommand(char[LENUSERINPUT]);
 
 void printcommand(struct command*);
 
