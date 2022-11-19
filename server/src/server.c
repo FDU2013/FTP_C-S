@@ -85,7 +85,7 @@ void ServerWork(struct ClientInfo *client_info) {
           PutCommand(shp, socketfd_client);
           break;
         case kDelete:
-          PutCommand(shp, socketfd_client);
+          DeleteCommand(shp, socketfd_client);
           break;
         default:
           // print error
