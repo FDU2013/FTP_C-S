@@ -19,7 +19,7 @@ void recvPacket(struct Packet *packet, int sfd)
   ntoh_packet(packet);
 }
 
-void send_EOT(int sfd)
+void sendEOT(int sfd)
 {
   struct Packet *packet = malloc(size_packet);
   packet->type = kEnd;
@@ -27,7 +27,7 @@ void send_EOT(int sfd)
   free(packet);
 }
 
-void snedErrorPacket(int sfd)
+void sendErrorPacket(int sfd)
 {
   struct Packet *packet = malloc(size_packet);
   packet->type = kError;
