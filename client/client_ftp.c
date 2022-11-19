@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 			break;
 		case kDelete:
 			if (cmd->npaths)
-				DeleteCommand(*cmd->paths);
+				DeleteCommand(sfd_client, *cmd->paths);
 			else
 				fprintf(stderr, "No path to file given.\n");
 			break;
