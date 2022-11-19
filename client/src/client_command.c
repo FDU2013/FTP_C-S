@@ -142,7 +142,7 @@ void LsLocalCommand(char *lpwd)
 void LsCommand(int sfd_client)
 {
 
-  struct Packet *packet = malloc(size_packet);
+  struct Packet *packet = (struct Packet *)malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
   packet->connection_id = -1;
@@ -150,8 +150,11 @@ void LsCommand(int sfd_client)
 
   sendPacket(packet, sfd_client);
   // recvPacket(packet, sfd_client);
+  int i = 0;
   while (packet->type != kEnd)
   {
+    i++;
+    printf("%d\n",i);
     if (packet->type == kData && packet->command_type == kLs && strlen(packet->buf))
       printf("%s\n", packet->buf);
     recvPacket(packet, sfd_client);

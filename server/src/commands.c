@@ -14,11 +14,15 @@ void command_cd(struct Packet *packet, int sfd_client, char *message) {
 }
 
 void command_ls(struct Packet *packet, int sfd_client, char *lpwd) {
+  printf("begin_server_ls\n");
   packet->type = kData;
   DIR *d = opendir(lpwd);
   if (!d) throwErrorAndExit("opendir()", (int)d);
   struct dirent *e;
+  int i = 0;
   while (e = readdir(d)) {
+    i++;
+    printf("%d\n",i);
     sprintf(packet->buf, "%s\t%s",
             e->d_type == 4   ? "DIR:"
             : e->d_type == 8 ? "FILE:"

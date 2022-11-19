@@ -134,4 +134,6 @@ void hton_packet(struct Packet *);
 FILE *ReadFileAuto(char *filename);
 FILE *WriteFileAuto(char *filename);
 
+void PrintPacket(struct Packet *);
+
 #endif

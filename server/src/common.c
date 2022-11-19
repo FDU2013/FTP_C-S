@@ -40,3 +40,10 @@ FILE* WriteFileAuto(char* filename) {
     return fopen(filename, "wb");
   }
 }
+
+void PrintPacket(struct Packet*packet){
+  printf("connection_id is %d\n",packet->connection_id);
+  printf("type is %d\n",packet->type);
+  printf("command_type is %d\n",packet->command_type);
+  printf("data_size is %d\n",packet->data_size);
+}
