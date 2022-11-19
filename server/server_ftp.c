@@ -55,7 +55,8 @@ int main(void) {
 
 void *serve_client(void *info) {
   int sfd_client, connection_id, x;
-  struct Packet *shp;
+  struct Packet *shp = (struct Packet *)malloc(size_packet);
+  InitPacket(shp);
   char lpwd[BUF_SIZE];
   struct client_info *ci = (struct client_info *)info;
   sfd_client = ci->sfd;
