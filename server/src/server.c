@@ -65,24 +65,27 @@ void ServerWork(struct ClientInfo *client_info) {
       switch (shp->command_type) {
         case kPwd:
           if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-          command_pwd(shp, socketfd_client, lpwd);
+          PwdCommand(shp, socketfd_client, lpwd);
           break;
         case kCd:
           if ((flag = chdir(shp->buf)) == -1) fprintf(stderr, "Wrong path.\n");
-          command_cd(shp, socketfd_client, flag == -1 ? "fail" : "success");
+          CdCommand(shp, socketfd_client, flag == -1 ? "fail" : "success");
           break;
         case kMkdir:
-          command_mkdir(shp, socketfd_client);
+          MkdirCommand(shp, socketfd_client);
           break;
         case kLs:
           if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-          command_ls(shp, socketfd_client, lpwd);
+          LsCommand(shp, socketfd_client, lpwd);
           break;
         case kGet:
-          command_get(shp, socketfd_client);
+          GetCommand(shp, socketfd_client);
           break;
         case kPut:
-          command_put(shp, socketfd_client);
+          PutCommand(shp, socketfd_client);
+          break;
+        case kDelete:
+          PutCommand(shp, socketfd_client);
           break;
         default:
           // print error

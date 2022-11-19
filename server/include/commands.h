@@ -3,11 +3,12 @@
 
 #include <common.h>
 
-void command_pwd(struct Packet *, int, char *);
-void command_cd(struct Packet *, int, char *);
-void command_ls(struct Packet *, int, char *);
-void command_get(struct Packet *, int);
-void command_put(struct Packet *, int);
-void command_mkdir(struct Packet *, int);
+void PwdCommand(struct Packet *, int, char *);
+void CdCommand(struct Packet *, int, char *);
+void LsCommand(struct Packet *, int, char *);
+void GetCommand(struct Packet *, int);
+void PutCommand(struct Packet *, int);
+void MkdirCommand(struct Packet *, int);
+void DeleteCommand(struct Packet *, int);
 
 #endif

@@ -1,19 +1,19 @@
 #include <commands.h>
 #include <file_transfer.h>
 
-void command_pwd(struct Packet *packet, int sfd_client, char *lpwd) {
+void PwdCommand(struct Packet *packet, int sfd_client, char *lpwd) {
   packet->type = kData;
   strcpy(packet->buf, lpwd);
   sendPacket(packet, sfd_client);
 }
 
-void command_cd(struct Packet *packet, int sfd_client, char *message) {
+void CdCommand(struct Packet *packet, int sfd_client, char *message) {
   packet->type = kResponse;
   strcpy(packet->buf, message);
   sendPacket(packet, sfd_client);
 }
 
-void command_ls(struct Packet *packet, int sfd_client, char *lpwd) {
+void LsCommand(struct Packet *packet, int sfd_client, char *lpwd) {
   printf("begin_server_ls\n");
   packet->type = kData;
   DIR *d = opendir(lpwd);
@@ -22,7 +22,7 @@ void command_ls(struct Packet *packet, int sfd_client, char *lpwd) {
   int i = 0;
   while (e = readdir(d)) {
     i++;
-    printf("%d\n",i);
+    printf("%d\n", i);
     sprintf(packet->buf, "%s\t%s",
             e->d_type == 4   ? "DIR:"
             : e->d_type == 8 ? "FILE:"
@@ -33,7 +33,7 @@ void command_ls(struct Packet *packet, int sfd_client, char *lpwd) {
   sendEndPacket(sfd_client);
 }
 
-void command_get(struct Packet *packet, int sfd_client) {
+void GetCommand(struct Packet *packet, int sfd_client) {
   FILE *f = ReadFileAuto(packet->buf);  // Yo!
   packet->type = kResponse;
   packet->command_type = kGet;
@@ -48,7 +48,7 @@ void command_get(struct Packet *packet, int sfd_client) {
   sendEndPacket(sfd_client);
 }
 
-void command_put(struct Packet *packet, int sfd_client) {
+void PutCommand(struct Packet *packet, int sfd_client) {
   FILE *f = WriteFileAuto(packet->buf);
   packet->type = kResponse;
   packet->command_type = kPut;
@@ -62,7 +62,21 @@ void command_put(struct Packet *packet, int sfd_client) {
   }
 }
 
-void command_mkdir(struct Packet *packet, int sfd_client) {
+void DeleteCommand(struct Packet *packet, int sfd_client) {
+  char message[BUF_SIZE];
+  FILE *f = fopen(packet->buf, "rb");
+  if (!f) {
+    fprintf(stderr, "File do not exist!\n");
+    strcpy(message, "fail");
+  } else {
+    remove(packet->buf);
+    strcpy(message, "success");
+  }
+  strcpy(packet->buf, message);
+  sendPacket(packet, sfd_client);
+}
+
+void MkdirCommand(struct Packet *packet, int sfd_client) {
   char message[BUF_SIZE];
   DIR *d = opendir(packet->buf);
   if (d) {
