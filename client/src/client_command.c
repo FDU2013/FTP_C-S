@@ -39,7 +39,7 @@ static void append_path(struct command *c, char *s)
 struct command *userinputtocommand(char s[LENUSERINPUT])
 {
   struct command *cmd = (struct command *)malloc(sizeof(struct command));
-  cmd->id = -1;
+  cmd->type = -1;
   cmd->npaths = 0;
   cmd->paths = NULL;
   char *savestate;
@@ -50,12 +50,12 @@ struct command *userinputtocommand(char s[LENUSERINPUT])
     token = strtok_r(s, " \t\n", &savestate);
     if (token == NULL)
       break;
-    if (cmd->id == -1)
+    if (cmd->type == -1)
       for (j = 0; j < COMMAND_NUM; j++)
       {
         if (!strcmp(token, commandlist[j]))
         {
-          cmd->id = j;
+          cmd->type = j;
           break;
         }
       } // ommitting braces for the "for loop" here is \
@@ -65,7 +65,7 @@ struct command *userinputtocommand(char s[LENUSERINPUT])
     else
       append_path(cmd, token);
   }
-  if (cmd->id != -1)
+  if (cmd->type != -1)
     return cmd;
   else
   {
@@ -74,20 +74,20 @@ struct command *userinputtocommand(char s[LENUSERINPUT])
   }
 }
 
-void printcommand(struct command *c)
-{
-  if (!DEBUG)
-    return;
+// void printcommand(struct command *c)
+// {
+//   if (!DEBUG)
+//     return;
 
-  printf("Printing contents of the above command...\n");
-  printf("id = %d\n", c->id);
-  printf("npaths = %d\n", c->npaths);
-  printf("paths =\n");
-  int i;
-  for (i = 0; i < c->npaths; i++)
-    printf("\t%s\n", c->paths[i]);
-  printf("\n");
-}
+//   printf("Printing contents of the above command...\n");
+//   printf("id = %d\n", c->id);
+//   printf("npaths = %d\n", c->npaths);
+//   printf("paths =\n");
+//   int i;
+//   for (i = 0; i < c->npaths; i++)
+//     printf("\t%s\n", c->paths[i]);
+//   printf("\n");
+// }
 
 void PwdCommand(int sfd_client)
 {
@@ -180,7 +180,7 @@ void GetCommand(int sfd_client, char *filename)
   if (packet->type == kResponse && packet->command_type == kGet && strlen(packet->buf))
   {
     printf("%s\n", packet->buf);
-    receive_file(sfd_client, f);
+    receiveFile(sfd_client, f);
     fclose(f);
   }
   else
@@ -209,7 +209,7 @@ void PutCommand(int sfd_client, char *filename)
   if (packet->type == kResponse && packet->command_type == kPut && strlen(packet->buf))
   {
     printf("%s\n", packet->buf);
-    send_file(sfd_client, f);
+    sendFile(sfd_client, f);
   }
   else
     fprintf(stderr, "Error sending file.\n");
@@ -282,4 +282,13 @@ void DeleteCommand(int sfd_client, char *filename)
   free(packet);
 }
 
-void DeleteLocalCommand(char *path) {}
+void DeleteLocalCommand(char *filename) 
+{
+  FILE *f = fopen(filename,"rb");
+  if(!f){
+    fprintf(stderr, "File do not exist!\n");
+  }
+  else{
+    remove(filename);
+  }
+}

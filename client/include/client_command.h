@@ -7,7 +7,7 @@
 #define LENUSERINPUT 1024
 
 struct command {
-  short int id;
+  CommandType type;
   int npaths;
   char** paths;
 };

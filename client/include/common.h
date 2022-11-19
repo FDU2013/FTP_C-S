@@ -92,7 +92,7 @@ typedef short CommandType;
         (PACKET_SIZE - sizeof(short int) * 2 - sizeof(PacketType) - \
          sizeof(CommandType))
 #define COMMAND_NUM 13
-enum
+enum 
 {
         kGet,
         kPut,
@@ -107,7 +107,7 @@ enum
         kPwd,
         kLpwd,
         kExit
-};
+} ;
 enum
 {
         kRequest,

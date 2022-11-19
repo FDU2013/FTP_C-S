@@ -5,7 +5,7 @@ static size_t size_packet = sizeof(struct Packet);
 void sendPacket(struct Packet *packet, int sfd)
 {
   int expect;
-  htonp(packet);
+  hton_packet(packet);
   if ((expect = send(sfd, packet, size_packet, 0)) != size_packet)
     throwErrorAndExit("sendPacket()", expect);
   ntoh_packet(packet);

@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 		if (!cmd)
 			continue;
 		// printcommand(cmd);
-		switch (cmd->id)
+		switch (cmd->type)
 		{
 		case kGet:
 			if (cmd->npaths)
