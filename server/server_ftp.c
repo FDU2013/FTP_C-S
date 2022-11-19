@@ -5,8 +5,7 @@ size_t size_sockaddr = sizeof(struct sockaddr),
 
 void *serve_client(void *);
 
-int main(void)
-{
+int main(void) {
   // BEGIN: initialization
   struct sockaddr_in sin_server, sin_client;
   int sockerfd_server, socketfd_client;
@@ -19,7 +18,7 @@ int main(void)
 
   memset((char *)&sin_server, 0, sizeof(struct sockaddr_in));
   sin_server.sin_family = AF_INET;
-  sin_server.sin_port = htons(PORTSERVER);
+  sin_server.sin_port = htons(SERVER_PORT);
   sin_server.sin_addr.s_addr = htonl(INADDR_ANY);
 
   if ((expect = bind(sockerfd_server, (struct sockaddr *)&sin_server,
@@ -30,11 +29,10 @@ int main(void)
     throwErrorAndExit("listen()", expect);
 
   printf(ID "FTP Server started up @ local:%d. Waiting for client(s)...\n\n",
-         PORTSERVER);
+         SERVER_PORT);
   // END: initialization
 
-  while (1)
-  {
+  while (1) {
     if ((expect = socketfd_client = accept(
              sockerfd_server, (struct sockaddr *)&sin_client, &size_sockaddr)) <
         0)
@@ -55,67 +53,54 @@ int main(void)
   return 0;
 }
 
-void *serve_client(void *info)
-{
+void *serve_client(void *info) {
   int sfd_client, connection_id, x;
   struct Packet *shp;
-  char lpwd[LENBUFFER];
+  char lpwd[BUF_SIZE];
   struct client_info *ci = (struct client_info *)info;
   sfd_client = ci->sfd;
   connection_id = ci->cid;
 
-  while (1)
-  {
-
-    if ((x = recv(sfd_client, shp, size_packet, 0)) == 0)
-    {
+  while (1) {
+    if ((x = recv(sfd_client, shp, size_packet, 0)) == 0) {
       fprintf(stderr, "client closed/terminated. closing connection.\n");
       break;
     }
 
     ntoh_packet(shp);
 
-    if (shp->type == TERM)
-      break;
+    if (shp->type == kError) break;
 
-    if (shp->connection_id == -1)
-      shp->connection_id = connection_id;
+    if (shp->connection_id == -1) shp->connection_id = connection_id;
 
-    if (shp->type == kRequest)
-    {
-      switch (shp->command_type)
-      {
-      case kPwd:
-        if (!getcwd(lpwd, sizeof lpwd))
-          throwErrorAndExit("getcwd()", 0);
-        command_pwd(shp, sfd_client, lpwd);
-        break;
-      case kCd:
-        if ((x = chdir(shp->buf)) == -1)
-          fprintf(stderr, "Wrong path.\n");
-        command_cd(shp, sfd_client, x == -1 ? "fail" : "success");
-        break;
-      case kMkdir:
-        command_mkdir(shp, sfd_client);
-        break;
-      case kLs:
-        if (!getcwd(lpwd, sizeof lpwd))
-          throwErrorAndExit("getcwd()", 0);
-        command_ls(shp, sfd_client, lpwd);
-        break;
-      case kGet:
-        command_get(shp, sfd_client);
-        break;
-      case kPut:
-        command_put(shp, sfd_client);
-        break;
-      default:
-        // print error
-        break;
+    if (shp->type == kRequest) {
+      switch (shp->command_type) {
+        case kPwd:
+          if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
+          command_pwd(shp, sfd_client, lpwd);
+          break;
+        case kCd:
+          if ((x = chdir(shp->buf)) == -1) fprintf(stderr, "Wrong path.\n");
+          command_cd(shp, sfd_client, x == -1 ? "fail" : "success");
+          break;
+        case kMkdir:
+          command_mkdir(shp, sfd_client);
+          break;
+        case kLs:
+          if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
+          command_ls(shp, sfd_client, lpwd);
+          break;
+        case kGet:
+          command_get(shp, sfd_client);
+          break;
+        case kPut:
+          command_put(shp, sfd_client);
+          break;
+        default:
+          // print error
+          break;
       }
-    }
-    else
-    {
+    } else {
       // show error, send TERM and break
       fprintf(stderr, "packet incomprihensible. closing connection.\n");
       snedErrorPacket(sfd_client);
