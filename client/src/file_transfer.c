@@ -8,7 +8,7 @@ void sendPacket(struct Packet *packet, int sfd)
   hton_packet(packet);
   if ((expect = send(sfd, packet, size_packet, 0)) != size_packet)
     throwErrorAndExit("sendPacket()", expect);
-  // ntoh_packet(packet);
+  ntoh_packet(packet);
 }
 
 void recvPacket(struct Packet *packet, int sfd)
