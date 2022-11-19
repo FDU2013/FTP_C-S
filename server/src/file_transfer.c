@@ -1,38 +1,36 @@
 #include <file_transfer.h>
 
-static size_t size_packet = sizeof(struct Packet);
-
 void sendPacket(struct Packet *packet, int sfd) {
   int expect;
   hton_packet(packet);
-  if ((expect = send(sfd, packet, size_packet, 0)) != size_packet)
+  if ((expect = send(sfd, packet, PACKET_SIZE, 0)) != PACKET_SIZE)
     throwErrorAndExit("sendPacket()", expect);
   ntoh_packet(packet);
 }
 
 void recvPacket(struct Packet *packet, int sfd) {
   int expect;
-  if ((expect = recv(sfd, packet, size_packet, 0)) <= 0)
+  if ((expect = recv(sfd, packet, PACKET_SIZE, 0)) <= 0)
     throwErrorAndExit("recvPacket()", expect);
   ntoh_packet(packet);
 }
 
 void sendEndPacket(int sfd) {
-  struct Packet *packet = malloc(size_packet);
+  struct Packet *packet = malloc(PACKET_SIZE);
   packet->type = kEnd;
   sendPacket(packet, sfd);
   free(packet);
 }
 
 void snedErrorPacket(int sfd) {
-  struct Packet *packet = malloc(size_packet);
+  struct Packet *packet = malloc(PACKET_SIZE);
   packet->type = kError;
   sendPacket(packet, sfd);
   free(packet);
 }
 
 void sendFile(int sfd, FILE *f) {
-  struct Packet *packet = malloc(size_packet);
+  struct Packet *packet = malloc(PACKET_SIZE);
   int cntBytes = 0, cntPacket = 0;
   // while循环里面每次send一个packet
   while (!feof(f)) {
@@ -50,7 +48,7 @@ void sendFile(int sfd, FILE *f) {
 }
 
 void receiveFile(int sfd, FILE *f) {
-  struct Packet *packet = malloc(size_packet);
+  struct Packet *packet = malloc(PACKET_SIZE);
   int cntBytes = 0, cntPacket = 0;
   recvPacket(packet, sfd);
   // printpacket(hostPacket, HP);

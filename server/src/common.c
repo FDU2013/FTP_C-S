@@ -1,23 +1,19 @@
 #include <common.h>
 
-static size_t size_packet = sizeof(struct Packet);
-
 void InitPacket(struct Packet* p) { memset(p, 0, sizeof(struct Packet)); }
 
-void ntoh_packet(struct Packet* netPacket){
+void ntoh_packet(struct Packet* netPacket) {
   netPacket->connection_id = ntohs(netPacket->connection_id);
   netPacket->type = ntohs(netPacket->type);
   netPacket->command_type = ntohs(netPacket->command_type);
   netPacket->data_size = ntohs(netPacket->data_size);
 }
 
-void hton_packet(struct Packet* hostPacket){
-  
+void hton_packet(struct Packet* hostPacket) {
   hostPacket->connection_id = htons(hostPacket->connection_id);
   hostPacket->type = htons(hostPacket->type);
   hostPacket->command_type = htons(hostPacket->command_type);
   hostPacket->data_size = htons(hostPacket->data_size);
-
 }
 
 bool IsAsciiFile(char* filename) {
