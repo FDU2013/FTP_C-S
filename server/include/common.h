@@ -83,7 +83,7 @@
 #include <dirent.h>
 
 #define DEBUG 1
-#define SERVER_PORT 21
+#define SERVER_PORT 8888
 
 #define throwErrorAndExit(e, x)   \
   do {                            \

@@ -13,10 +13,10 @@ void ntoh_packet(struct Packet* netPacket){
 
 void hton_packet(struct Packet* hostPacket){
   
-  hostPacket->connection_id = ntohs(hostPacket->connection_id);
-  hostPacket->type = ntohs(hostPacket->type);
-  hostPacket->command_type = ntohs(hostPacket->command_type);
-  hostPacket->data_size = ntohs(hostPacket->data_size);
+  hostPacket->connection_id = htons(hostPacket->connection_id);
+  hostPacket->type = htons(hostPacket->type);
+  hostPacket->command_type = htons(hostPacket->command_type);
+  hostPacket->data_size = htons(hostPacket->data_size);
 
 }
 

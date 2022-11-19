@@ -149,7 +149,7 @@ void LsCommand(int sfd_client)
   packet->command_type = kLs;
 
   sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
+  // recvPacket(packet, sfd_client);
   while (packet->type != kEnd)
   {
     if (packet->type == kData && packet->command_type == kLs && strlen(packet->buf))
