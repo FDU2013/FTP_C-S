@@ -5,7 +5,7 @@
 void sendPacket(struct Packet *packet, int sfd);
 void recvPacket(struct Packet *packet, int sfd);
 
-void send_EOT(int sfd);
+void sendEndPacket(int sfd);
 void snedErrorPacket(int sfd);
 
 void sendFile(int, FILE *);

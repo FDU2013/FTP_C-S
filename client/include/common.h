@@ -1,5 +1,5 @@
-#ifndef COMMONS_H
-#define COMMONS_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include <arpa/inet.h>
 #include <stdbool.h>
