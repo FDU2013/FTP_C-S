@@ -2,27 +2,30 @@
 
 static size_t size_packet = sizeof(struct Packet);
 
-void InitPacket(struct Packet* p) { memset(p, 0, sizeof(struct Packet)); }
+void InitPacket(struct Packet *p) { memset(p, 0, sizeof(struct Packet)); }
 
-void ntoh_packet(struct Packet* netPacket){
+void ntoh_packet(struct Packet *netPacket)
+{
   netPacket->connection_id = ntohs(netPacket->connection_id);
   netPacket->type = ntohs(netPacket->type);
   netPacket->command_type = ntohs(netPacket->command_type);
   netPacket->data_size = ntohs(netPacket->data_size);
 }
 
-void hton_packet(struct Packet* hostPacket){
-  
+void hton_packet(struct Packet *hostPacket)
+{
+
   hostPacket->connection_id = htons(hostPacket->connection_id);
   hostPacket->type = htons(hostPacket->type);
   hostPacket->command_type = htons(hostPacket->command_type);
   hostPacket->data_size = htons(hostPacket->data_size);
-
 }
 
-bool IsAsciiFile(char* filename) {
+bool IsAsciiFile(char *filename)
+{
   int len = strlen(filename);
-  if (len > 4 && strcmp(".txt", filename + len - 4) == 0) {
+  if (len > 4 && strcmp(".txt", filename + len - 4) == 0)
+  {
     // printf("(info).txt file, transfer by ascii mode\n");
     return true;
   }
@@ -30,17 +33,33 @@ bool IsAsciiFile(char* filename) {
   return false;
 }
 
-FILE* ReadFileAuto(char* filename) {
-  if (IsAsciiFile(filename)) {
+FILE *ReadFileAuto(char *filename)
+{
+  if (IsAsciiFile(filename))
+  {
     return fopen(filename, "r");
-  } else {
+  }
+  else
+  {
     return fopen(filename, "rb");
   }
 }
-FILE* WriteFileAuto(char* filename) {
-  if (IsAsciiFile(filename)) {
+FILE *WriteFileAuto(char *filename)
+{
+  if (IsAsciiFile(filename))
+  {
     return fopen(filename, "w");
-  } else {
+  }
+  else
+  {
     return fopen(filename, "wb");
   }
+}
+
+void PrintPacket(struct Packet *packet)
+{
+  printf("connection_id is %d\n", packet->connection_id);
+  printf("type is %d\n", packet->type);
+  printf("command_type is %d\n", packet->command_type);
+  printf("data_size is %d\n", packet->data_size);
 }

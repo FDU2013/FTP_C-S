@@ -39,6 +39,7 @@ void sendFile(int sfd, FILE *f)
 {
   struct Packet *packet = malloc(size_packet);
   int cntBytes = 0, cntPacket = 0;
+  packet->type = kData;
   // while循环里面每次send一个packet
   while (!feof(f))
   {

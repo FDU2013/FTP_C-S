@@ -32,6 +32,7 @@ void snedErrorPacket(int sfd) {
 void sendFile(int sfd, FILE *f) {
   struct Packet *packet = malloc(PACKET_SIZE);
   int cntBytes = 0, cntPacket = 0;
+  packet->type = kData;
   // while循环里面每次send一个packet
   while (!feof(f)) {
     memset(packet->buf, 0, sizeof(char) * BUF_SIZE);
