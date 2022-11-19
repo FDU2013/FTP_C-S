@@ -150,11 +150,8 @@ void LsCommand(int sfd_client)
 
   sendPacket(packet, sfd_client);
   // recvPacket(packet, sfd_client);
-  int i = 0;
   while (packet->type != kEnd)
   {
-    i++;
-    printf("%d\n",i);
     if (packet->type == kData && packet->command_type == kLs && strlen(packet->buf))
       printf("%s\n", packet->buf);
     recvPacket(packet, sfd_client);
@@ -285,13 +282,15 @@ void DeleteCommand(int sfd_client, char *filename)
   free(packet);
 }
 
-void DeleteLocalCommand(char *filename) 
+void DeleteLocalCommand(char *filename)
 {
-  FILE *f = fopen(filename,"rb");
-  if(!f){
+  FILE *f = fopen(filename, "rb");
+  if (!f)
+  {
     fprintf(stderr, "File do not exist!\n");
   }
-  else{
+  else
+  {
     remove(filename);
   }
 }

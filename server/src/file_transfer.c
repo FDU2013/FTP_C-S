@@ -2,7 +2,8 @@
 
 static size_t size_packet = sizeof(struct Packet);
 
-void sendPacket(struct Packet *packet, int sfd) {
+void sendPacket(struct Packet *packet, int sfd)
+{
   int expect;
   hton_packet(packet);
   if ((expect = send(sfd, packet, size_packet, 0)) != size_packet)
@@ -10,32 +11,38 @@ void sendPacket(struct Packet *packet, int sfd) {
   ntoh_packet(packet);
 }
 
-void recvPacket(struct Packet *packet, int sfd) {
+void recvPacket(struct Packet *packet, int sfd)
+{
   int expect;
   if ((expect = recv(sfd, packet, size_packet, 0)) <= 0)
     throwErrorAndExit("recvPacket()", expect);
   ntoh_packet(packet);
 }
 
-void sendEndPacket(int sfd) {
+void sendEndPacket(int sfd)
+{
   struct Packet *packet = malloc(size_packet);
   packet->type = kEnd;
   sendPacket(packet, sfd);
   free(packet);
 }
 
-void snedErrorPacket(int sfd) {
+void snedErrorPacket(int sfd)
+{
   struct Packet *packet = malloc(size_packet);
   packet->type = kError;
   sendPacket(packet, sfd);
   free(packet);
 }
 
-void sendFile(int sfd, FILE *f) {
+void sendFile(int sfd, FILE *f)
+{
   struct Packet *packet = malloc(size_packet);
   int cntBytes = 0, cntPacket = 0;
+  packet->type = kData;
   // while循环里面每次send一个packet
-  while (!feof(f)) {
+  while (!feof(f))
+  {
     memset(packet->buf, 0, sizeof(char) * BUF_SIZE);
     packet->data_size = fread(packet->buf, 1, BUF_SIZE - 1, f);
     cntBytes += packet->data_size;
@@ -49,23 +56,26 @@ void sendFile(int sfd, FILE *f) {
   free(packet);
 }
 
-void receiveFile(int sfd, FILE *f) {
+void receiveFile(int sfd, FILE *f)
+{
   struct Packet *packet = malloc(size_packet);
   int cntBytes = 0, cntPacket = 0;
   recvPacket(packet, sfd);
   // printpacket(hostPacket, HP);
-  while (packet->type == kData) {
+  while (packet->type == kData)
+  {
     cntBytes += fwrite(packet->buf, 1, packet->data_size, f);
     cntPacket++;
     recvPacket(packet, sfd);
     // printpacket(hostPacket, HP);
   }
   fprintf(stderr, "%d data packet(s) received.\n",
-          cntPacket);  // j decremented because the last packet is EOT.
+          cntPacket); // j decremented because the last packet is EOT.
   fprintf(stderr, "%d byte(s) written.\n", cntBytes);
   if (packet->type == kEnd)
     return;
-  else {
+  else
+  {
     fprintf(stderr, "Error occured while downloading remote file.\n");
     exit(2);
   }
