@@ -1,67 +1,88 @@
 #include <commands.h>
 
-void PwdCommand(struct Packet *packet, int sfd_client, char *lpwd) {
+void PwdCommand(struct Packet *packet, int socketfd_client, char *lpwd) {
   packet->type = kData;
   strcpy(packet->buf, lpwd);
-  sendPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
 }
 
-void CdCommand(struct Packet *packet, int sfd_client, char *message) {
+void CdCommand(struct Packet *packet, int socketfd_client, char *message) {
   packet->type = kResponse;
   printf("mess:%s\n", message);
   strcpy(packet->buf, message);
-  sendPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
 }
 
-void LsCommand(struct Packet *packet, int sfd_client, char *lpwd) {
+void LsCommand(struct Packet *packet, int socketfd_client, char *lpwd) {
   packet->type = kData;
-  DIR *d = opendir(lpwd);
-  if (!d) throwErrorAndExit("opendir()", (int)d);
-  struct dirent *e;
-  while (e = readdir(d)) {
-    sprintf(packet->buf, "%s\t%s",
-            e->d_type == 4   ? "DIR:"
-            : e->d_type == 8 ? "FILE:"
-                             : "UNDEF:",
-            e->d_name);
-    sendPacket(packet, sfd_client);
+  DIR *this_dir = opendir(lpwd);
+  if (!this_dir) throwErrorAndExit("ls()", (int)this_dir);
+  struct dirent *this_dirent;
+  int i = 0;
+  while (this_dirent = readdir(this_dir)) {
+    i++;
+    if (i < 3) continue;
+    switch (this_dirent->d_type) {
+      case DT_DIR:
+        sprintf(packet->buf, "%s%s", "(Dir) ", this_dirent->d_name);
+        break;
+      case DT_REG:
+        sprintf(packet->buf, "%s%s", "(File) ", this_dirent->d_name);
+        break;
+      case DT_UNKNOWN:
+        sprintf(packet->buf, "%s%s", "(Unknown) ", this_dirent->d_name);
+        break;
+      default:
+        sprintf(packet->buf, "%s%s", "(Other) ", this_dirent->d_name);
+        break;
+    }
+    SendPacket(packet, socketfd_client);
   }
-  sendEndPacket(sfd_client);
+  closedir(this_dir);
+  // struct dirent *e;
+  // while (e = readdir(this_dir)) {
+  // sprintf(packet->buf, "%s\t%s",
+  //         e->d_type == 4   ? "DIR:"
+  //         : e->d_type == 8 ? "FILE:"
+  //                          : "UNDEF:",
+  //         e->d_name);
+  //   SendPacket(packet, socketfd_client);
+  // }
+  SendEndPacket(socketfd_client);
 }
 
-void GetCommand(struct Packet *packet, int sfd_client) {
-  FILE *f = ReadFileAuto(packet->buf);  // Yo!
+void GetCommand(struct Packet *packet, int socketfd_client) {
+  FILE *file = ReadFileAuto(packet->buf);  // Yo!
   packet->type = kResponse;
   packet->command_type = kGet;
-  strcpy(packet->buf, f ? "File found; processing" : "Error opening file.");
-  // printpacket(packet, HP);
-  sendPacket(packet, sfd_client);
-  if (f) {
+  strcpy(packet->buf, file ? "Getting:" : "(Server)Error opening file.");
+  SendPacket(packet, socketfd_client);
+  if (file) {
     packet->type = kData;
-    sendFile(sfd_client, f);
-    fclose(f);
+    SendFile(socketfd_client, file);
+    fclose(file);
+    SendEndPacket(socketfd_client);
   }
-  sendEndPacket(sfd_client);
 }
 
-void PutCommand(struct Packet *packet, int sfd_client) {
-  FILE *f = WriteFileAuto(packet->buf);
+void PutCommand(struct Packet *packet, int socketfd_client) {
+  FILE *file = WriteFileAuto(packet->buf);
   packet->type = kResponse;
   packet->command_type = kPut;
-  strcpy(packet->buf, f ? "Everything in order; processing"
-                        : "Error opening file for writing on server side.");
+  strcpy(packet->buf, file ? "Everything in order; processing"
+                           : "Error opening file for writing on server side.");
   // printpacket(packet, HP);
-  sendPacket(packet, sfd_client);
-  if (f) {
-    receiveFile(sfd_client, f);
-    fclose(f);
+  SendPacket(packet, socketfd_client);
+  if (file) {
+    ReceiveFile(socketfd_client, file);
+    fclose(file);
   }
 }
 
-void DeleteCommand(struct Packet *packet, int sfd_client) {
+void DeleteCommand(struct Packet *packet, int socketfd_client) {
   char message[BUF_SIZE];
-  FILE *f = fopen(packet->buf, "rb");
-  if (!f) {
+  FILE *file = fopen(packet->buf, "rb");
+  if (!file) {
     fprintf(stderr, "File do not exist!\n");
     strcpy(message, "fail");
   } else {
@@ -71,15 +92,15 @@ void DeleteCommand(struct Packet *packet, int sfd_client) {
   packet->type = kResponse;
   // printf("mess:%s\n", message);
   strcpy(packet->buf, message);
-  sendPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
 }
 
-void MkdirCommand(struct Packet *packet, int sfd_client) {
+void MkdirCommand(struct Packet *packet, int socketfd_client) {
   char message[BUF_SIZE];
-  DIR *d = opendir(packet->buf);
-  if (d) {
+  DIR *this_dir = opendir(packet->buf);
+  if (this_dir) {
     strcpy(message, "already exists");
-    closedir(d);
+    closedir(this_dir);
   } else if (mkdir(packet->buf, 0777) == -1) {
     fprintf(stderr, "Wrong path.\n");
     strcpy(message, "fail");
@@ -88,5 +109,5 @@ void MkdirCommand(struct Packet *packet, int sfd_client) {
 
   packet->type = kResponse;
   strcpy(packet->buf, message);
-  sendPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
 }

@@ -1,45 +1,45 @@
 #include <file_transfer.h>
 
-void sendPacket(struct Packet *packet, int sfd) {
+void SendPacket(struct Packet *packet, int socket_fd) {
   int expect;
   hton_packet(packet);
-  if ((expect = send(sfd, packet, PACKET_SIZE, 0)) != PACKET_SIZE)
-    throwErrorAndExit("sendPacket()", expect);
+  if ((expect = send(socket_fd, packet, PACKET_SIZE, 0)) != PACKET_SIZE)
+    throwErrorAndExit("SendPacket()", expect);
   ntoh_packet(packet);
 }
 
-void recvPacket(struct Packet *packet, int sfd) {
+void RecvPacket(struct Packet *packet, int socket_fd) {
   int expect;
-  if ((expect = recv(sfd, packet, PACKET_SIZE, 0)) <= 0)
-    throwErrorAndExit("recvPacket()", expect);
+  if ((expect = recv(socket_fd, packet, PACKET_SIZE, 0)) <= 0)
+    throwErrorAndExit("RecvPacket()", expect);
   ntoh_packet(packet);
 }
 
-void sendEndPacket(int sfd) {
+void SendEndPacket(int socket_fd) {
   struct Packet *packet = malloc(PACKET_SIZE);
   packet->type = kEnd;
-  sendPacket(packet, sfd);
+  SendPacket(packet, socket_fd);
   free(packet);
 }
 
-void snedErrorPacket(int sfd) {
+void snedErrorPacket(int socket_fd) {
   struct Packet *packet = malloc(PACKET_SIZE);
   packet->type = kError;
-  sendPacket(packet, sfd);
+  SendPacket(packet, socket_fd);
   free(packet);
 }
 
-void sendFile(int sfd, FILE *f) {
+void SendFile(int socket_fd, FILE *file) {
   struct Packet *packet = malloc(PACKET_SIZE);
   int cntBytes = 0, cntPacket = 0;
   packet->type = kData;
   // while循环里面每次send一个packet
-  while (!feof(f)) {
+  while (!feof(file)) {
     memset(packet->buf, 0, sizeof(char) * BUF_SIZE);
-    packet->data_size = fread(packet->buf, 1, BUF_SIZE - 1, f);
+    packet->data_size = fread(packet->buf, 1, BUF_SIZE - 1, file);
     cntBytes += packet->data_size;
     cntPacket++;
-    sendPacket(packet, sfd);
+    SendPacket(packet, socket_fd);
     //记得转换回去给while循环的下一个阶段用
   }
   fprintf(stderr, "%d byte(s) read.\n", cntBytes);
@@ -48,15 +48,15 @@ void sendFile(int sfd, FILE *f) {
   free(packet);
 }
 
-void receiveFile(int sfd, FILE *f) {
+void ReceiveFile(int socket_fd, FILE *file) {
   struct Packet *packet = malloc(PACKET_SIZE);
   int cntBytes = 0, cntPacket = 0;
-  recvPacket(packet, sfd);
+  RecvPacket(packet, socket_fd);
   // printpacket(hostPacket, HP);
   while (packet->type == kData) {
-    cntBytes += fwrite(packet->buf, 1, packet->data_size, f);
+    cntBytes += fwrite(packet->buf, 1, packet->data_size, file);
     cntPacket++;
-    recvPacket(packet, sfd);
+    RecvPacket(packet, socket_fd);
     // printpacket(hostPacket, HP);
   }
   fprintf(stderr, "%d data packet(s) received.\n",

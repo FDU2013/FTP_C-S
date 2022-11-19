@@ -1,12 +1,13 @@
 #include <common.h>
 
-#define extract_filename(filepath) ((strrchr(filepath, '/') != NULL) ? (strrchr(filepath, '/') + 1) : filepath)
+#define extract_filename(filepath) \
+  ((strrchr(filepath, '/') != NULL) ? (strrchr(filepath, '/') + 1) : filepath)
 
-void sendPacket(struct Packet *packet, int sfd);
-void recvPacket(struct Packet *packet, int sfd);
+void SendPacket(struct Packet *packet, int sfd);
+void RecvPacket(struct Packet *packet, int sfd);
 
-void sendEndPacket(int sfd);
+void SendEndPacket(int sfd);
 void snedErrorPacket(int sfd);
 
-void sendFile(int, FILE *);
-void receiveFile(int, FILE *);
+void SendFile(int, FILE *);
+void ReceiveFile(int, FILE *);

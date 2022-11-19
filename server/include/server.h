@@ -1,15 +1,9 @@
 #ifndef SERVER_INCLUDE_SERVER_H_
 #define SERVER_INCLUDE_SERVER_H_
 
-#define ID "SERVER=> "
 #include <commands.h>
 #include <sys/stat.h>
 #include <time.h>
-
-struct client_info {
-  int sfd;
-  int cid;
-};
 
 #define TERMINAL_HEAD "Server> "
 

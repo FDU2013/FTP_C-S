@@ -1,20 +1,18 @@
 #include <common.h>
 #include <file_transfer.h>
 
-#define IPSERVER "127.0.0.1"
-#define ID "CLIENT=> "
+#define SERVER_IP "127.0.0.1"
+#define TERMINAL_HEAD "Client=> "
 
-#define LENUSERINPUT 1024
+#define INPUT_LENTH_MAX 512
 
-struct command {
+struct Command {
   CommandType type;
-  int npaths;
-  char** paths;
+  int para_num;
+  char** parameters;
 };
 
-struct command* inputCommand(char[LENUSERINPUT]);
-
-void printcommand(struct command*);
+struct Command* InputCommand(char[INPUT_LENTH_MAX]);
 
 void PwdCommand(int);
 void CdLocalCommand(char*);

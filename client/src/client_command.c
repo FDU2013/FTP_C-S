@@ -2,120 +2,92 @@
 
 static size_t size_packet = sizeof(struct Packet);
 
-static const char commandlist[COMMAND_NUM][10] = {
-    "get", "put",
+#define COMMAND_LENTH_MAX 10
+static const char all_commands[COMMAND_NUM][COMMAND_LENTH_MAX] = {
+    "get",    "put",
 
-    "cd", "lcd",
+    "cd",     "lcd",
 
     "delete", "ldelete",
 
-    "ls", "lls",
+    "ls",     "lls",
 
-    "mkdir", "lmkdir",
+    "mkdir",  "lmkdir",
 
-    "pwd", "lpwd",
+    "pwd",    "lpwd",
 
-    "exit"}; // any change made here should also be \
-				replicated accordingly in the COMMANDS \
-				enum in commons.h
+    "exit"};
 
-static void appendPath(struct command *c, char *s)
-{
-  c->npaths++;
-  char **temp_paths = (char **)malloc(c->npaths * sizeof(char *));
-  if (c->npaths > 1)
-    memcpy(temp_paths, c->paths, (c->npaths - 1) * sizeof(char *));
+static void AppendPath(struct Command *cmd, char *s) {
+  cmd->para_num++;
+  char **temp_paths = (char **)malloc(cmd->para_num * sizeof(char *));
+  if (cmd->para_num > 1)
+    memcpy(temp_paths, cmd->parameters, (cmd->para_num - 1) * sizeof(char *));
 
   char *temps = (char *)malloc((strlen(s) + 1) * sizeof(char));
   int i;
-  for (i = 0; *(temps + i) = *(s + i) == ':' ? ' ' : *(s + i); i++)
-    ;
+  for (i = 0; *(temps + i) = *(s + i) == ':' ? ' ' : *(s + i); i++) {
+  }
 
-  *(temp_paths + c->npaths - 1) = temps;
+  *(temp_paths + cmd->para_num - 1) = temps;
 
-  c->paths = temp_paths;
+  cmd->parameters = temp_paths;
 }
 
-struct command *inputCommand(char s[LENUSERINPUT])
-{
-  struct command *cmd = (struct command *)malloc(sizeof(struct command));
+struct Command *InputCommand(char out[INPUT_LENTH_MAX]) {
+  struct Command *cmd = (struct Command *)malloc(sizeof(struct Command));
   cmd->type = -1;
-  cmd->npaths = 0;
-  cmd->paths = NULL;
+  cmd->para_num = 0;
+  cmd->parameters = NULL;
   char *savestate;
   char *token;
-  int i, j;
-  for (i = 0;; i++, s = NULL)
-  {
-    token = strtok_r(s, " \t\n", &savestate);
-    if (token == NULL)
-      break;
-    if (cmd->type == -1)
-      for (j = 0; j < COMMAND_NUM; j++)
-      {
-        if (!strcmp(token, commandlist[j]))
-        {
+  for (int i = 0;; i++, out = NULL) {
+    token = strtok_r(out, " \t\n", &savestate);
+    if (token == NULL) break;
+    if (cmd->type == -1) {
+      for (int j = 0; j < COMMAND_NUM; j++) {
+        if (!strcmp(token, all_commands[j])) {
           cmd->type = j;
           break;
         }
-      } // ommitting braces for the "for loop" here is \
-			 disastrous because the else below gets \
-			 associated with the "if inside the for loop". \
-			 #BUGFIX
-    else
-      appendPath(cmd, token);
+      }
+    } else {
+      AppendPath(cmd, token);
+    }
   }
   if (cmd->type != -1)
     return cmd;
-  else
-  {
+  else {
     fprintf(stderr, "Error parsing command\n");
     return NULL;
   }
 }
 
-// void printcommand(struct command *c)
-// {
-//   if (!DEBUG)
-//     return;
-
-//   printf("Printing contents of the above command...\n");
-//   printf("id = %d\n", c->id);
-//   printf("npaths = %d\n", c->npaths);
-//   printf("paths =\n");
-//   int i;
-//   for (i = 0; i < c->npaths; i++)
-//     printf("\t%s\n", c->paths[i]);
-//   printf("\n");
-// }
-
-void PwdCommand(int sfd_client)
-{
+void PwdCommand(int socketfd_client) {
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kPwd;
-  sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
-  if (packet->type == kData && packet->command_type == kPwd && strlen(packet->buf) > 0)
+  SendPacket(packet, socketfd_client);
+  RecvPacket(packet, socketfd_client);
+  if (packet->type == kData && packet->command_type == kPwd &&
+      strlen(packet->buf) > 0)
     printf("%s\n", packet->buf);
   else
     fprintf(stderr, "Error retrieving kResponsermation.\n");
   free(packet);
 }
 
-void CdCommand(int sfd_client, char *path)
-{
+void CdCommand(int socketfd_client, char *path) {
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kCd;
   strcpy(packet->buf, path);
-  sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
-  if (packet->type == kResponse && packet->command_type == kCd && !strcmp(packet->buf, "success"))
+  SendPacket(packet, socketfd_client);
+  RecvPacket(packet, socketfd_client);
+  if (packet->type == kResponse && packet->command_type == kCd &&
+      !strcmp(packet->buf, "success"))
     ;
   else
     fprintf(stderr, "Error executing command on the server.\n");
@@ -123,173 +95,176 @@ void CdCommand(int sfd_client, char *path)
   free(packet);
 }
 
-void LsLocalCommand(char *lpwd)
-{
-  DIR *d = opendir(lpwd);
-  if (!d)
-    throwErrorAndExit("opendir()", (int)d);
-  struct dirent *e;
-  while (e = readdir(d))
-    printf("%s\t%s\n",
-           e->d_type == 4   ? "DIR:"
-           : e->d_type == 8 ? "FILE:"
-                            : "UNDEF",
-           e->d_name);
-  closedir(d);
+void LsLocalCommand(char *local_pwd) {
+  DIR *local_dir = opendir(local_pwd);
+  if (!local_dir) throwErrorAndExit("local_ls()", local_dir);
+  struct dirent *this_dirent;
+  int i = 0;
+  while (this_dirent = readdir(local_dir)) {
+    i++;
+    if (i < 3) continue;
+    switch (this_dirent->d_type) {
+      case DT_DIR:
+        printf("%s%s\n", "(Dir) ", this_dirent->d_name);
+        break;
+      case DT_REG:
+        printf("%s%s\n", "(File) ", this_dirent->d_name);
+        break;
+      case DT_UNKNOWN:
+        printf("%s%s\n", "(Unknown) ", this_dirent->d_name);
+        break;
+      default:
+        printf("%s%s\n", "(Other) ", this_dirent->d_name);
+        break;
+    }
+    //   printf("%s\t%s\n",
+    //          this_dirent->d_type == 4   ? "DIR:"
+    //          : this_dirent->d_type == 8 ? "FILE:"
+    //                                     : "UNDEF",
+    //          this_dirent->d_name);
+    // }
+  }
+  closedir(local_dir);
 }
 
-void LsCommand(int sfd_client)
-{
-
+void LsCommand(int socketfd_client) {
   struct Packet *packet = (struct Packet *)malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kLs;
 
-  sendPacket(packet, sfd_client);
-  // recvPacket(packet, sfd_client);
-  while (packet->type != kEnd)
-  {
-    if (packet->type == kData && packet->command_type == kLs && strlen(packet->buf))
+  SendPacket(packet, socketfd_client);
+  // RecvPacket(packet, socketfd_client);
+  while (packet->type != kEnd) {
+    if (packet->type == kData && packet->command_type == kLs &&
+        strlen(packet->buf))
       printf("%s\n", packet->buf);
-    recvPacket(packet, sfd_client);
+    RecvPacket(packet, socketfd_client);
   }
   free(packet);
 }
 
-void GetCommand(int sfd_client, char *filename)
-{
-  FILE *f = WriteFileAuto(filename);
-  if (!f)
-  {
-    fprintf(stderr, "File could not be opened for writing. Aborting...\n");
-    return;
-  }
-
+void GetCommand(int socketfd_client, char *filename) {
+  // FILE *l_file = WriteFileAuto(filename);
+  // if (!l_file) {
+  //   fprintf(stderr, "Local file write failed.\n");
+  //   return;
+  // }
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kGet;
   strcpy(packet->buf, filename);
 
-  sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
-  if (packet->type == kResponse && packet->command_type == kGet && strlen(packet->buf))
-  {
+  SendPacket(packet, socketfd_client);
+  RecvPacket(packet, socketfd_client);
+  if (packet->type == kResponse && packet->command_type == kGet &&
+      strlen(packet->buf)) {
     printf("%s\n", packet->buf);
-    receiveFile(sfd_client, f);
-    fclose(f);
-  }
-  else
-    fprintf(stderr, "Error getting remote file : <%s>\n", filename);
+    if (strcmp(packet->buf, "(Server)Error opening file.")) {
+      char name[50] = "(copy)";
+      if (!access(filename, 0)) {
+        strcat(name, filename);
+      } else {
+        strcpy(name, filename);
+      }
+      FILE *l_file = WriteFileAuto(name);
+      if (!l_file) {
+        fprintf(stderr, "Local file write failed.\n");
+        return;
+      }
+      ReceiveFile(socketfd_client, l_file);
+      fclose(l_file);
+    }
+  } else
+    fprintf(stderr, "Server does not allow getting or send illegal message .");
 }
 
-void PutCommand(int sfd_client, char *filename)
-{
-  FILE *f = ReadFileAuto(filename); // Yo!
-  if (!f)
-  {
-    fprintf(stderr, "File could not be opened for reading. Aborting...\n");
+void PutCommand(int socketfd_client, char *filename) {
+  FILE *l_file = ReadFileAuto(filename);  // Yo!
+  if (!l_file) {
+    fprintf(stderr, "Local file read failed.\n");
     return;
   }
 
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kPut;
   strcpy(packet->buf, filename);
 
-  sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
+  RecvPacket(packet, socketfd_client);
 
-  if (packet->type == kResponse && packet->command_type == kPut && strlen(packet->buf))
-  {
+  if (packet->type == kResponse && packet->command_type == kPut &&
+      strlen(packet->buf)) {
     printf("%s\n", packet->buf);
-    sendFile(sfd_client, f);
-  }
-  else
-    fprintf(stderr, "Error sending file.\n");
+    SendFile(socketfd_client, l_file);
+  } else
+    fprintf(stderr, "Received illegal message from server.\n");
   free(packet);
-  fclose(f);
-  sendEOT(sfd_client);
+  fclose(l_file);
+  SendEndPacket(socketfd_client);
 }
 
-void MkdirLocalCommand(int sfd_client, char *dirname)
-{
+void MkdirLocalCommand(int socketfd_client, char *dirname) {
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kMkdir;
   strcpy(packet->buf, dirname);
 
-  sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
+  RecvPacket(packet, socketfd_client);
 
-  if (packet->type == kResponse && packet->command_type == kMkdir)
-  {
+  if (packet->type == kResponse && packet->command_type == kMkdir) {
     if (!strcmp(packet->buf, "success"))
-      printf("Created directory on server.\n");
+      printf("Created directory on server successfully.\n");
     else if (!strcmp(packet->buf, "already exists"))
-      printf("Directory already exitst on server.\n");
-  }
-  else
-    fprintf(stderr, "Error executing command on the server.\n");
+      printf("Directory has already exitsted on server.\n");
+  } else
+    fprintf(stderr, "Received illegal message from server.\n");
   free(packet);
 }
 
-void LmkdirCommand(char *dirname)
-{
-  DIR *d = opendir(dirname);
-  if (d)
-  {
-    printf("Directory already exists.\n");
-    closedir(d);
-  }
-  else if (mkdir(dirname, 0777) == -1)
+void LmkdirCommand(char *dirname) {
+  DIR *l_dir = opendir(dirname);
+  if (l_dir) {
+    printf("Directory has already existed.\n");
+    closedir(l_dir);
+  } else if (mkdir(dirname, 0777) == -1)
     fprintf(stderr, "Error in creating directory.\n");
   else
     printf("Created directory.\n");
 }
 
-void CdLocalCommand(char *path)
-{
-  if (chdir(path) == -1)
-    fprintf(stderr, "Wrong path : <%s>\n", path);
+void CdLocalCommand(char *path) {
+  if (chdir(path) == -1) fprintf(stderr, "Path is not valid : <%s>\n", path);
 }
 
-void DeleteCommand(int sfd_client, char *filename)
-{
+void DeleteCommand(int socketfd_client, char *filename) {
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;
-  packet->connection_id = -1;
   packet->command_type = kDelete;
   strcpy(packet->buf, filename);
 
-  sendPacket(packet, sfd_client);
-  recvPacket(packet, sfd_client);
+  SendPacket(packet, socketfd_client);
+  RecvPacket(packet, socketfd_client);
 
   if (packet->type == kResponse && packet->command_type == kDelete &&
       !strcmp(packet->buf, "success"))
     ;
   else
-    fprintf(stderr, "Error executing command on the server.\n");
+    fprintf(stderr, "Received illegal message from server.\n");
   free(packet);
 }
 
-void DeleteLocalCommand(char *filename)
-{
-  FILE *f = fopen(filename, "rb");
-  if (!f)
-  {
-    fprintf(stderr, "File do not exist!\n");
-  }
-  else
-  {
+void DeleteLocalCommand(char *filename) {
+  FILE *l_file = fopen(filename, "rb");
+  if (!l_file) {
+    fprintf(stderr, "File does not exist!\n");
+  } else {
     remove(filename);
   }
 }

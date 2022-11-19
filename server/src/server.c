@@ -42,58 +42,59 @@ void ConnectClient(struct sockaddr_in *client_sock, int *sockerfd_server,
 
 void ServerWork(struct ClientInfo *client_info) {
   int socketfd_client, connection_id;
-  struct Packet *shp = (struct Packet *)malloc(PACKET_SIZE);
-  InitPacket(shp);
-  char lpwd[BUF_SIZE];
+  struct Packet *packet = (struct Packet *)malloc(PACKET_SIZE);
+  InitPacket(packet);
+  char local_pwd[BUF_SIZE];
   socketfd_client = client_info->socket_fd;
   connection_id = client_info->connection_id;
 
   int flag;
   while (1) {
-    if ((flag = recv(socketfd_client, shp, PACKET_SIZE, 0)) == 0) {
-      fprintf(stderr, "client closed/terminated. closing connection.\n");
+    if ((flag = recv(socketfd_client, packet, PACKET_SIZE, 0)) == 0) {
+      fprintf(stderr, "Client is closed or terminated. Closing connection.\n");
       break;
     }
-
-    ntoh_packet(shp);
-
-    if (shp->type == kError) break;
-
-    if (shp->connection_id == -1) shp->connection_id = connection_id;
-
-    if (shp->type == kRequest) {
-      switch (shp->command_type) {
+    ntoh_packet(packet);
+    if (packet->type == kError) break;
+    packet->connection_id = connection_id;
+    if (packet->type == kRequest) {
+      switch (packet->command_type) {
         case kPwd:
-          if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-          PwdCommand(shp, socketfd_client, lpwd);
+          if (!getcwd(local_pwd, sizeof local_pwd)) {
+            throwErrorAndExit("getcwd()", 0);
+          }
+          PwdCommand(packet, socketfd_client, local_pwd);
           break;
         case kCd:
-          if ((flag = chdir(shp->buf)) == -1) fprintf(stderr, "Wrong path.\n");
-          CdCommand(shp, socketfd_client, flag == -1 ? "fail" : "success");
+          if ((flag = chdir(packet->buf)) == -1) {
+            fprintf(stderr, "Path wrong.\n");
+          }
+          CdCommand(packet, socketfd_client, flag == -1 ? "fail" : "success");
           break;
         case kMkdir:
-          MkdirCommand(shp, socketfd_client);
+          MkdirCommand(packet, socketfd_client);
           break;
         case kLs:
-          if (!getcwd(lpwd, sizeof lpwd)) throwErrorAndExit("getcwd()", 0);
-          LsCommand(shp, socketfd_client, lpwd);
+          if (!getcwd(local_pwd, sizeof local_pwd)) {
+            throwErrorAndExit("getcwd()", 0);
+          }
+          LsCommand(packet, socketfd_client, local_pwd);
           break;
         case kGet:
-          GetCommand(shp, socketfd_client);
+          GetCommand(packet, socketfd_client);
           break;
         case kPut:
-          PutCommand(shp, socketfd_client);
+          PutCommand(packet, socketfd_client);
           break;
         case kDelete:
-          DeleteCommand(shp, socketfd_client);
+          DeleteCommand(packet, socketfd_client);
           break;
         default:
-          // print error
+          fprintf(stderr, "Command type wrong.\n");
           break;
       }
     } else {
-      // show error, send TERM and break
-      fprintf(stderr, "packet incomprihensible. closing connection.\n");
+      fprintf(stderr, "Recieved abnormal request. Closing connection.\n");
       snedErrorPacket(socketfd_client);
       break;
     }
