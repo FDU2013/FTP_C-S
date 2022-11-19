@@ -12,7 +12,7 @@ void CdCommand(struct Packet *packet, int sfd_client, char *message) {
   sendPacket(packet, sfd_client);
 }
 
-void command_ls(struct Packet *packet, int sfd_client, char *lpwd) {
+void LsCommand(struct Packet *packet, int sfd_client, char *lpwd) {
   packet->type = kData;
   DIR *d = opendir(lpwd);
   if (!d) throwErrorAndExit("opendir()", (int)d);

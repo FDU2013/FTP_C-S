@@ -1,6 +1,5 @@
 #include <server.h>
 
-static size_t sockaddr_size = sizeof(struct sockaddr);
 int main(void) {
   struct sockaddr_in server_sock, client_sock;
   int sockerfd_server, socketfd_client;
@@ -14,7 +13,7 @@ int main(void) {
     ServerWork(&client_info);
   }
   close(sockerfd_server);
-  printf(TERMINAL_HEAD "Done.\n");
+  printf(TERMINAL_HEAD "Exit.\n");
   fflush(stdout);
 
   return 0;
