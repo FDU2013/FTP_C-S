@@ -86,6 +86,9 @@
 #define SERVER_PORT 8888
 
 // const int sockaddr_size = sizeof(struct sockaddr);
+// const char *kSuccessMessage = "success";
+// const char *kFailMessage = "fail";
+
 #define throwErrorAndExit(e, x)   \
   do {                            \
     perror("ERROR IN: " #e "\n"); \

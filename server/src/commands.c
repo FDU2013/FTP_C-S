@@ -8,6 +8,7 @@ void PwdCommand(struct Packet *packet, int sfd_client, char *lpwd) {
 
 void CdCommand(struct Packet *packet, int sfd_client, char *message) {
   packet->type = kResponse;
+  printf("mess:%s\n", message);
   strcpy(packet->buf, message);
   sendPacket(packet, sfd_client);
 }
@@ -67,6 +68,8 @@ void DeleteCommand(struct Packet *packet, int sfd_client) {
     remove(packet->buf);
     strcpy(message, "success");
   }
+  packet->type = kResponse;
+  // printf("mess:%s\n", message);
   strcpy(packet->buf, message);
   sendPacket(packet, sfd_client);
 }
