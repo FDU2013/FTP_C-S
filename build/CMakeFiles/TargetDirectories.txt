@@ -1,8 +1,0 @@
-/home/wjf/checkpoint1/FTP_C-S/build/CMakeFiles/rebuild_cache.dir
-/home/wjf/checkpoint1/FTP_C-S/build/CMakeFiles/edit_cache.dir
-/home/wjf/checkpoint1/FTP_C-S/build/client/CMakeFiles/rebuild_cache.dir
-/home/wjf/checkpoint1/FTP_C-S/build/client/CMakeFiles/edit_cache.dir
-/home/wjf/checkpoint1/FTP_C-S/build/client/CMakeFiles/ftp_client.dir
-/home/wjf/checkpoint1/FTP_C-S/build/server/CMakeFiles/rebuild_cache.dir
-/home/wjf/checkpoint1/FTP_C-S/build/server/CMakeFiles/edit_cache.dir
-/home/wjf/checkpoint1/FTP_C-S/build/server/CMakeFiles/ftp_server.dir
