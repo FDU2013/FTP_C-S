@@ -84,53 +84,61 @@
 
 #define DEBUG 1
 #define SERVER_PORT 21
-typedef short PacketType;
-enum { kRequest, kResponse, kData, kEnd, kError };
-
-#define throwErrorAndExit(e, x)   \
-  do {                            \
-    perror("ERROR IN: " #e "\n"); \
-    fprintf(stderr, "%d\n", x);   \
-    exit(-1);                     \
-  } while (0)
-
-
 #define PACKET_SIZE 512
-#define BUF_SIZE                                              \
-  (PACKET_SIZE - sizeof(short int) * 2 - sizeof(PacketType) - \
-   sizeof(CommandType))
 
-struct Packet {
-  short connection_id;
-  PacketType type;
-  CommandType command_type;
-  short data_size;
-  char buf[BUF_SIZE];
-};
-
-void InitPacket(struct Packet*);
-void ntoh_packet(struct Packet*);
-void hton_packet(struct Packet*);
-
-FILE* ReadFileAuto(char* filename);
-FILE* WriteFileAuto(char* filename);
-
-#define COMMAND_NUM 13
+typedef short PacketType;
 typedef short CommandType;
-enum {
-  kGet,
-  kPut,
-  kCd,
-  kLcd,
-  kDelete,
-  kLdelete,
-  kLs,
-  kLls,
-  kMkdir,
-  kLmkdir,
-  kPwd,
-  kLpwd,
-  kExit
+#define BUF_SIZE                                                    \
+        (PACKET_SIZE - sizeof(short int) * 2 - sizeof(PacketType) - \
+         sizeof(CommandType))
+#define COMMAND_NUM 13
+enum
+{
+        kGet,
+        kPut,
+        kCd,
+        kLcd,
+        kDelete,
+        kLdelete,
+        kLs,
+        kLls,
+        kMkdir,
+        kLmkdir,
+        kPwd,
+        kLpwd,
+        kExit
 };
+enum
+{
+        kRequest,
+        kResponse,
+        kData,
+        kEnd,
+        kError
+};
+
+#define throwErrorAndExit(e, x)               \
+        do                                    \
+        {                                     \
+                perror("ERROR IN: " #e "\n"); \
+                fprintf(stderr, "%d\n", x);   \
+                exit(-1);                     \
+        } while (0)
+
+struct Packet
+{
+        short connection_id;
+        PacketType type;
+        CommandType command_type;
+        short data_size;
+        char buf[BUF_SIZE];
+};
+
+void InitPacket(struct Packet *);
+void ntoh_packet(struct Packet *);
+void hton_packet(struct Packet *);
+
+FILE *ReadFileAuto(char *filename);
+FILE *WriteFileAuto(char *filename);
 
 #endif
