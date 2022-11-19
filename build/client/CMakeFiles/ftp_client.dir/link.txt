@@ -1,0 +1,1 @@
+/usr/bin/cc   -rdynamic CMakeFiles/ftp_client.dir/client_ftp.c.o CMakeFiles/ftp_client.dir/src/client_command.c.o CMakeFiles/ftp_client.dir/src/common.c.o CMakeFiles/ftp_client.dir/src/file_transfer.c.o  -o ../../dir_client/ftp_client 
