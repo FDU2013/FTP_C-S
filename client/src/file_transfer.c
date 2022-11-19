@@ -5,24 +5,18 @@ static size_t size_packet = sizeof(struct Packet);
 void sendPacket(struct Packet *packet, int sfd)
 {
   int expect;
-  struct Packet data = *packet;
-  htonp(data);
-  
-  //hton_packet(packet);
+  hton_packet(packet);
   if ((expect = send(sfd, packet, size_packet, 0)) != size_packet)
     throwErrorAndExit("sendPacket()", expect);
-  //ntoh_packet(packet);
+  ntoh_packet(packet);
 }
 
 void recvPacket(struct Packet *packet, int sfd)
 {
   int expect;
-  struct Packet data;
-  if ((expect = recv(sfd, &data, size_packet, 0)) <= 0)
+  if ((expect = recv(sfd, packet, size_packet, 0)) <= 0)
     throwErrorAndExit("recvPacket()", expect);
-  ntoh_packet(data);
-  *packet = data;
-  //ntoh_packet(packet);
+  ntoh_packet(packet);
 }
 
 void send_EOT(int sfd)
