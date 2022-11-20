@@ -18,10 +18,7 @@ void LsCommand(struct Packet *packet, int socketfd_client, char *lpwd) {
   DIR *this_dir = opendir(lpwd);
   if (!this_dir) throwErrorAndExit("ls()", (int)this_dir);
   struct dirent *this_dirent;
-  int i = 0;
   while (this_dirent = readdir(this_dir)) {
-    i++;
-    if (i < 3) continue;
     switch (this_dirent->d_type) {
       case DT_DIR:
         sprintf(packet->buf, "%s%s", "(Dir) ", this_dirent->d_name);

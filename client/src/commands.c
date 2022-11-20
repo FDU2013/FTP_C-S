@@ -98,10 +98,7 @@ void LsLocalCommand(char *local_pwd) {
   DIR *local_dir = opendir(local_pwd);
   if (!local_dir) throwErrorAndExit("local_ls()", local_dir);
   struct dirent *this_dirent;
-  int i = 0;
   while (this_dirent = readdir(local_dir)) {
-    i++;
-    if (i < 3) continue;
     switch (this_dirent->d_type) {
       case DT_DIR:
         printf("%s%s\n", "(Dir) ", this_dirent->d_name);
