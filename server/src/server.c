@@ -94,7 +94,7 @@ void ServerWork(struct ClientInfo *client_info) {
       }
     } else {
       fprintf(stderr, "Recieved abnormal request. Closing connection.\n");
-      snedErrorPacket(socketfd_client);
+      SendErrorPacket(socketfd_client);
       break;
     }
   }

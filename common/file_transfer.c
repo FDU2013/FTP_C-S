@@ -22,7 +22,7 @@ void SendEndPacket(int socket_fd) {
   free(packet);
 }
 
-void snedErrorPacket(int socket_fd) {
+void SendErrorPacket(int socket_fd) {
   struct Packet *packet = malloc(PACKET_SIZE);
   packet->type = kError;
   SendPacket(packet, socket_fd);

@@ -16,7 +16,7 @@ void CdCommand(struct Packet *packet, int socketfd_client, char *message) {
 void LsCommand(struct Packet *packet, int socketfd_client, char *lpwd) {
   packet->type = kData;
   DIR *this_dir = opendir(lpwd);
-  if (!this_dir) throwErrorAndExit("ls()", (int)this_dir);
+  if (!this_dir) throwErrorAndExit("ls()", this_dir);
   struct dirent *this_dirent;
   while (this_dirent = readdir(this_dir)) {
     switch (this_dirent->d_type) {
