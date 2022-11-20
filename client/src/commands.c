@@ -96,7 +96,7 @@ void CdCommand(int socketfd_client, char *path) {
 
 void LsLocalCommand(char *local_pwd) {
   DIR *local_dir = opendir(local_pwd);
-  if (!local_dir) throwErrorAndExit("local_ls()", local_dir);
+  if (!local_dir) throwFileErrorAndExit("local_ls()", local_pwd);
   struct dirent *this_dirent;
   while (this_dirent = readdir(local_dir)) {
     switch (this_dirent->d_type) {

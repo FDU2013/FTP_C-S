@@ -40,8 +40,13 @@ enum {
   kExit
 };
 
-#define throwErrorAndExit(error, message) \
-  (perror("Error in: " #error "\n"), fprintf(stderr, "%d\n", message), exit(-1))
+#define throwErrorAndExit(error, code)                                         \
+  (perror("Error in: " #error "\n"), fprintf(stderr, "error code:%d\n", code), \
+   exit(-1))
+
+#define throwFileErrorAndExit(error, message) \
+  (perror("Error in: " #error "\n"),          \
+   fprintf(stderr, "error message:%s\n", message), exit(-1))
 
 struct Packet {
   short connection_id;
