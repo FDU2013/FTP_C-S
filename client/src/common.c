@@ -1,7 +1,5 @@
 #include <common.h>
 
-static size_t size_packet = sizeof(struct Packet);
-
 void InitPacket(struct Packet *p) { memset(p, 0, sizeof(struct Packet)); }
 
 void ntoh_packet(struct Packet *netPacket) {
@@ -100,6 +98,29 @@ static bool FileHasSpecHeader(const char *fname) {
   return false;
 }
 
+bool FileHasNoSuffix(char *filename) {
+  int i = 0;
+  while (filename[i] != '\0') {
+    if (filename[i] == '.') {
+      return false;
+    }
+    i++;
+  }
+  return true;
+}
+
+bool IsAsciiFile(char *filename) {
+  if (FileHasNoSuffix(filename)) {
+    return false;
+  } else if (FileHasSpecSuffix(filename)) {
+    return false;
+  } else if (FileHasSpecHeader(filename)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 // bool IsAsciiFile(char *filename) {
 //   int len = strlen(filename);
 //   if (len > 4 && strcmp(".txt", filename + len - 4) == 0) {
@@ -109,16 +130,6 @@ static bool FileHasSpecHeader(const char *fname) {
 //   // printf("(info)normal file, transfer by binary mode \n");
 //   return false;
 // }
-
-bool IsAsciiFile(char *filename) {
-  if (FileHasSpecSuffix(filename)) {
-    return true;
-  } else if (FileHasSpecHeader(filename)) {
-    return true;
-  } else {
-    return false;
-  }
-}
 
 FILE *ReadFileAuto(char *filename) {
   if (IsAsciiFile(filename)) {

@@ -1,5 +1,6 @@
 #include <common.h>
 #include <file_transfer.h>
+#include <sys/stat.h>
 
 #define SERVER_IP "127.0.0.1"
 #define TERMINAL_HEAD "Client=> "

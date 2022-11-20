@@ -2,6 +2,7 @@
 #define SERVER_INCLUDE_COMMANDS_H_
 
 #include <common.h>
+#include <file_transfer.h>
 
 void PwdCommand(struct Packet *, int, char *);
 void CdCommand(struct Packet *, int, char *);

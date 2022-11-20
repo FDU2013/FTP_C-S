@@ -1,6 +1,8 @@
 #include <client_command.h>
+#include <common.h>
+#include <file_transfer.h>
 
-static size_t size_packet = sizeof(struct Packet);
+static int size_packet = sizeof(struct Packet);
 
 #define COMMAND_LENTH_MAX 10
 static const char all_commands[COMMAND_NUM][COMMAND_LENTH_MAX] = {

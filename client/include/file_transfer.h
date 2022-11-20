@@ -1,13 +1,10 @@
 #include <common.h>
 
-#define extract_filename(filepath) \
-  ((strrchr(filepath, '/') != NULL) ? (strrchr(filepath, '/') + 1) : filepath)
+void SendPacket(struct Packet *packet, int socket_fd);
+void RecvPacket(struct Packet *packet, int socket_fd);
 
-void SendPacket(struct Packet *packet, int sfd);
-void RecvPacket(struct Packet *packet, int sfd);
-
-void SendEndPacket(int sfd);
-void sendErrorPacket(int sfd);
+void SendEndPacket(int socket_fd);
+void sendErrorPacket(int socket_fd);
 
 void SendFile(int, FILE *);
 void ReceiveFile(int, FILE *);

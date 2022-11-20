@@ -98,13 +98,26 @@ static bool FileHasSpecHeader(const char *fname) {
   return false;
 }
 
+bool FileHasNoSuffix(char *filename) {
+  int i = 0;
+  while (filename[i] != '\0') {
+    if (filename[i] == '.') {
+      return false;
+    }
+    i++;
+  }
+  return true;
+}
+
 bool IsAsciiFile(char *filename) {
-  if (FileHasSpecSuffix(filename)) {
-    return true;
-  } else if (FileHasSpecHeader(filename)) {
-    return true;
-  } else {
+  if (FileHasNoSuffix(filename)) {
     return false;
+  } else if (FileHasSpecSuffix(filename)) {
+    return false;
+  } else if (FileHasSpecHeader(filename)) {
+    return false;
+  } else {
+    return true;
   }
 }
 

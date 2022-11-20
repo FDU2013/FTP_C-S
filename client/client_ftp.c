@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
     throwErrorAndExit("connect()", x);
 
   printf(
-      "Client=> FTP Client started up. Attempting communication with server @ "
-      "%s:%d...\n\n",
+      "Client=> FTP Client startup. Try to connect to server "
+      "%s:(server_port)%d\n\n",
       SERVER_IP, SERVER_PORT);
   // END: initialization
 

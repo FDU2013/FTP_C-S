@@ -1,7 +1,6 @@
-#include <file_transfer.h>
 #include <server.h>
 
-static size_t sockaddr_size = sizeof(struct sockaddr);
+static int sockaddr_size = sizeof(struct sockaddr);
 
 void InitSever(struct sockaddr_in *server_sock, int *sockerfd_server) {
   struct sockaddr_in sin_server;
@@ -24,7 +23,7 @@ void InitSever(struct sockaddr_in *server_sock, int *sockerfd_server) {
     throwErrorAndExit("listen()", expect);
 
   printf(TERMINAL_HEAD
-         "FTP Server started up @ local:%d. Waiting for client(s)...\n\n",
+         "FTP Server startup at localhost:%d. Waiting for connections...\n\n",
          SERVER_PORT);
 }
 
@@ -35,7 +34,7 @@ void ConnectClient(struct sockaddr_in *client_sock, int *sockerfd_server,
            *sockerfd_server, (struct sockaddr *)client_sock, &sockaddr_size)) <
       0)
     throwErrorAndExit("accept()", expect);
-  printf(TERMINAL_HEAD "Communication started with %s:%d\n",
+  printf(TERMINAL_HEAD "Start connection with %s:(sin_port)%d\n",
          inet_ntoa(client_sock->sin_addr), ntohs(client_sock->sin_port));
   fflush(stdout);
 }

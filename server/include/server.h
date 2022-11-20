@@ -2,6 +2,7 @@
 #define SERVER_INCLUDE_SERVER_H_
 
 #include <commands.h>
+#include <file_transfer.h>
 #include <sys/stat.h>
 #include <time.h>
 

@@ -1,6 +1,6 @@
 #include <file_transfer.h>
 
-static size_t size_packet = sizeof(struct Packet);
+static int size_packet = sizeof(struct Packet);
 
 void SendPacket(struct Packet *packet, int socket_fd) {
   int expect;
