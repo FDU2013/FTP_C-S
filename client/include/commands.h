@@ -1,11 +1,11 @@
+#ifndef CLIENT_INCLUDE_COMMANDS_H_
+#define CLIENT_INCLUDE_COMMANDS_H_
+
 #include <common.h>
 #include <file_transfer.h>
 #include <sys/stat.h>
 
-#define SERVER_IP "127.0.0.1"
-#define TERMINAL_HEAD "Client=> "
-
-#define INPUT_LENTH_MAX 512
+#define CMD_LENTH_MAX 10
 
 struct Command {
   CommandType type;
@@ -13,6 +13,7 @@ struct Command {
   char** parameters;
 };
 
+#define INPUT_LENTH_MAX 512
 struct Command* InputCommand(char[INPUT_LENTH_MAX]);
 
 void PwdCommand(int);
@@ -26,3 +27,5 @@ void LmkdirCommand(char*);
 void MkdirLocalCommand(int, char*);
 void DeleteCommand(int, char*);
 void DeleteLocalCommand(char*);
+
+#endif

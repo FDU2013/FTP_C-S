@@ -1,5 +1,5 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef COMMON_COMMON_H
+#define COMMON_COMMON_H
 
 #include <arpa/inet.h>
 #include <dirent.h>
@@ -13,14 +13,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define DEBUG 1
 #define SERVER_PORT 8888
-#define PACKET_SIZE 512
 
+#define PACKET_SIZE 512
 #define BUF_SIZE                                              \
   (PACKET_SIZE - sizeof(short int) * 2 - sizeof(PacketType) - \
    sizeof(CommandType))
 
+typedef short PacketType;
+enum { kRequest, kResponse, kData, kEnd, kError };
 #define COMMAND_NUM 13
 typedef short CommandType;
 enum {
@@ -38,8 +39,6 @@ enum {
   kLpwd,
   kExit
 };
-typedef short PacketType;
-enum { kRequest, kResponse, kData, kEnd, kError };
 
 #define throwErrorAndExit(error, message) \
   (perror("Error in: " #error "\n"), fprintf(stderr, "%d\n", message), exit(-1))

@@ -1,11 +1,8 @@
-#include <client_command.h>
-#include <common.h>
-#include <file_transfer.h>
+#include <commands.h>
 
 static int size_packet = sizeof(struct Packet);
 
-#define COMMAND_LENTH_MAX 10
-static const char all_commands[COMMAND_NUM][COMMAND_LENTH_MAX] = {
+static const char kAllCommands[COMMAND_NUM][CMD_LENTH_MAX] = {
     "get",    "put",
 
     "cd",     "lcd",
@@ -48,7 +45,7 @@ struct Command *InputCommand(char out[INPUT_LENTH_MAX]) {
     if (token == NULL) break;
     if (cmd->type == -1) {
       for (int j = 0; j < COMMAND_NUM; j++) {
-        if (!strcmp(token, all_commands[j])) {
+        if (!strcmp(token, kAllCommands[j])) {
           cmd->type = j;
           break;
         }
@@ -119,12 +116,6 @@ void LsLocalCommand(char *local_pwd) {
         printf("%s%s\n", "(Other) ", this_dirent->d_name);
         break;
     }
-    //   printf("%s\t%s\n",
-    //          this_dirent->d_type == 4   ? "DIR:"
-    //          : this_dirent->d_type == 8 ? "FILE:"
-    //                                     : "UNDEF",
-    //          this_dirent->d_name);
-    // }
   }
   closedir(local_dir);
 }
@@ -147,11 +138,6 @@ void LsCommand(int socketfd_client) {
 }
 
 void GetCommand(int socketfd_client, char *filename) {
-  // FILE *l_file = WriteFileAuto(filename);
-  // if (!l_file) {
-  //   fprintf(stderr, "Local file write failed.\n");
-  //   return;
-  // }
   struct Packet *packet = malloc(size_packet);
   InitPacket(packet);
   packet->type = kRequest;

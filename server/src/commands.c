@@ -8,7 +8,7 @@ void PwdCommand(struct Packet *packet, int socketfd_client, char *lpwd) {
 
 void CdCommand(struct Packet *packet, int socketfd_client, char *message) {
   packet->type = kResponse;
-  printf("mess:%s\n", message);
+  // printf("mess:%s\n", message);
   strcpy(packet->buf, message);
   SendPacket(packet, socketfd_client);
 }
@@ -39,20 +39,11 @@ void LsCommand(struct Packet *packet, int socketfd_client, char *lpwd) {
     SendPacket(packet, socketfd_client);
   }
   closedir(this_dir);
-  // struct dirent *e;
-  // while (e = readdir(this_dir)) {
-  // sprintf(packet->buf, "%s\t%s",
-  //         e->d_type == 4   ? "DIR:"
-  //         : e->d_type == 8 ? "FILE:"
-  //                          : "UNDEF:",
-  //         e->d_name);
-  //   SendPacket(packet, socketfd_client);
-  // }
   SendEndPacket(socketfd_client);
 }
 
 void GetCommand(struct Packet *packet, int socketfd_client) {
-  FILE *file = ReadFileAuto(packet->buf);  // Yo!
+  FILE *file = ReadFileAuto(packet->buf);
   packet->type = kResponse;
   packet->command_type = kGet;
   strcpy(packet->buf, file ? "Getting:" : "(Server)Error opening file.");

@@ -4,23 +4,23 @@ static int sockaddr_size = sizeof(struct sockaddr);
 
 void InitSever(struct sockaddr_in *server_sock, int *sockerfd_server) {
   struct sockaddr_in sin_server;
-  int expect;
+  int error_flag;
 
-  if ((expect = *sockerfd_server = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) <
-      0)
-    throwErrorAndExit("socket()", expect);
+  if ((error_flag = *sockerfd_server =
+           socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
+    throwErrorAndExit("socket()", error_flag);
 
   memset((char *)server_sock, 0, sizeof(struct sockaddr_in));
   server_sock->sin_family = AF_INET;
   server_sock->sin_port = htons(SERVER_PORT);
   server_sock->sin_addr.s_addr = htonl(INADDR_ANY);
 
-  if ((expect = bind(*sockerfd_server, (struct sockaddr *)server_sock,
-                     sockaddr_size)) < 0)
-    throwErrorAndExit("bind()", expect);
+  if ((error_flag = bind(*sockerfd_server, (struct sockaddr *)server_sock,
+                         sockaddr_size)) < 0)
+    throwErrorAndExit("bind()", error_flag);
 
-  if ((expect = listen(*sockerfd_server, 1)) < 0)
-    throwErrorAndExit("listen()", expect);
+  if ((error_flag = listen(*sockerfd_server, 1)) < 0)
+    throwErrorAndExit("listen()", error_flag);
 
   printf(TERMINAL_HEAD
          "FTP Server startup at localhost:%d. Waiting for connections...\n\n",
@@ -29,11 +29,11 @@ void InitSever(struct sockaddr_in *server_sock, int *sockerfd_server) {
 
 void ConnectClient(struct sockaddr_in *client_sock, int *sockerfd_server,
                    int *socketfd_client) {
-  int expect;
-  if ((expect = (*socketfd_client) = accept(
+  int error_flag;
+  if ((error_flag = (*socketfd_client) = accept(
            *sockerfd_server, (struct sockaddr *)client_sock, &sockaddr_size)) <
       0)
-    throwErrorAndExit("accept()", expect);
+    throwErrorAndExit("accept()", error_flag);
   printf(TERMINAL_HEAD "Start connection with %s:(sin_port)%d\n",
          inet_ntoa(client_sock->sin_addr), ntohs(client_sock->sin_port));
   fflush(stdout);
